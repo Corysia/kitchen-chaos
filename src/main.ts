@@ -3,37 +3,42 @@ import "@babylonjs/inspector";
 
 class Main {
 
+    static engine: Engine;
+    static scene: Scene;
     constructor() {
         let canvas = document.createElement("canvas");
         canvas.style.width = "100%";
         canvas.style.height = "100%";
         canvas.id = "renderCanvas";
         document.body.appendChild(canvas);
-        let engine = new Engine(canvas, true);
-        let scene = this.createScene(engine, canvas);
+        Main.engine = new Engine(canvas, true);
+        Main.scene = this.createScene(Main.engine, canvas);
 
         window.addEventListener("resize", function () {
-            engine.resize();
+            Main.engine.resize();
         });
 
         window.addEventListener("keydown", (ev) => {
             // Shift+Ctrl+Alt+F
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === "KeyF") {
-                engine.switchFullscreen(false);
+                Main.engine.switchFullscreen(false);
             }
 
             // Shift+Ctrl+Alt+I
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === "KeyI") {
-                if (scene.debugLayer.isVisible()) {
-                    scene.debugLayer.hide();
+                if (Main.scene.debugLayer.isVisible()) {
+                    Main.scene.debugLayer.hide();
                 } else {
-                    scene.debugLayer.show();
+                    Main.scene.debugLayer.show();
                 }
             }
         });
 
-        engine.runRenderLoop(function () {
-            scene.render();
+    }
+
+    public start(): void {
+        Main.engine.runRenderLoop(function () {
+            Main.scene.render();
         })
     }
 
@@ -65,8 +70,13 @@ class Main {
         // Our built-in 'ground' shape. Params: name, options, scene
         let ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
 
+        // Move the ground down
+        ground.position.y = 0;
+
         return scene;
     }
 }
 
-new Main();
+let main = new Main();
+main.start();
+
