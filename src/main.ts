@@ -1,4 +1,4 @@
-import { Scene, Engine, FreeCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
+import { Scene, Engine, FreeCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3, BaseTexture } from "@babylonjs/core";
 import "@babylonjs/inspector";
 
 class Main {
@@ -68,10 +68,10 @@ class Main {
         ground.position = new Vector3(0, 0, 0);
 
         const groundMaterial = new StandardMaterial("groundMaterial", scene);
-        const groundTexture = new Texture("/textures/ButtonBackground.png", scene);
-        groundTexture.uScale = 50;
-        groundTexture.vScale = 50;
-        groundMaterial.diffuseTexture = groundTexture;
+        groundMaterial.diffuseTexture = new Texture("./textures/ButtonBackground.png", scene);
+        (groundMaterial.diffuseTexture as Texture).uScale = 50;
+        (groundMaterial.diffuseTexture as Texture).vScale = 50;
+
         ground.material = groundMaterial;;
 
         return scene;
