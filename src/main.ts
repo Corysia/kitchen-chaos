@@ -1,4 +1,4 @@
-import { Scene, Engine, FreeCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
+import { Scene, Engine, FreeCamera, GroundMesh, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
 import "@babylonjs/inspector";
 
 class Main {
@@ -62,19 +62,36 @@ class Main {
         light.intensity = 0.7;
 
         // Our built-in 'ground' shape. Params: name, options, scene
-        let ground = MeshBuilder.CreateGround("ground", { width: 5, height: 5 }, scene);
-
-        // Move the ground to the origin
-        ground.position = new Vector3(0, 0, 0);
-
-        const groundMaterial = new StandardMaterial("groundMaterial", scene);
-        groundMaterial.diffuseTexture = new Texture("./textures/ButtonBackground.png", scene);
-        (groundMaterial.diffuseTexture as Texture).uScale = 50;
-        (groundMaterial.diffuseTexture as Texture).vScale = 50;
-
-        ground.material = groundMaterial;;
+        this.createGround();
 
         return scene;
+    }
+
+    /**
+     * Creates and returns a StandardMaterial for the ground with a diffuse texture.
+     * The texture is scaled to repeat 50 times along both the U and V axes.
+     *
+     * @returns {StandardMaterial} The configured ground material.
+     */
+
+    private createGroundMaterial(): StandardMaterial {
+        const groundMaterial = new StandardMaterial("groundMaterial", Main.scene);
+        groundMaterial.diffuseTexture = new Texture("./textures/ButtonBackground.png", Main.scene);
+        (groundMaterial.diffuseTexture as Texture).uScale = 50;
+        (groundMaterial.diffuseTexture as Texture).vScale = 50;
+        return groundMaterial;
+    }
+
+    /**
+     * Creates and returns a GroundMesh for the scene, with the
+     * StandardMaterial returned by createGroundMaterial.
+     *
+     * @returns {GroundMesh} The created and configured ground mesh.
+     */
+    private createGround(): GroundMesh {
+        let ground = MeshBuilder.CreateGround("ground", { width: 5, height: 5 }, Main.scene);
+        ground.material = this.createGroundMaterial();
+        return ground;
     }
 }
 
