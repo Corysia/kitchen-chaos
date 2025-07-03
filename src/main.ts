@@ -1,4 +1,4 @@
-import { Scene, Engine, FreeCamera, GroundMesh, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
+import { Scene, Engine, FreeCamera, GroundMesh, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3, SceneLoader, ImportMeshAsync } from "@babylonjs/core";
 import "@babylonjs/inspector";
 
 class Main {
@@ -54,7 +54,7 @@ class Main {
         const scene = new Scene(engine);
 
         // This creates and positions a free camera (non-mesh)
-        const camera = new FreeCamera("camera1", new Vector3(0, 3, -3), scene);
+        const camera = new FreeCamera("camera1", new Vector3(0, 10, -10), scene);
 
         // This targets the camera to scene origin
         camera.setTarget(Vector3.Zero());
@@ -68,8 +68,23 @@ class Main {
         // Default intensity is 1. Let's dim the light a small amount
         light.intensity = 0.7;
 
-        this.createGround(5, 5, "./textures/ButtonBackground.png", 10, 10);
+        this.createGround(50, 50, "./textures/ButtonBackground.png", 50, 50);
+
+        this.loadActors();
+
         return scene;
+    }
+
+    private async loadActors(): Promise<void> {
+        let result = await ImportMeshAsync("./models/PlayerVisual.glb", Main.scene);
+        const PlayerVisual = result.meshes[0];
+        PlayerVisual.position = new Vector3(0, 0, 0);
+        PlayerVisual.rotation = new Vector3(0, 0, 0);
+
+        result = await ImportMeshAsync("./models/ClearCounter_Visual.glb", Main.scene);
+        const ClearCounter = result.meshes[0];
+        ClearCounter.position = new Vector3(2, 0, 2);
+        ClearCounter.rotation = new Vector3(0, 0, 0);
     }
 
 
