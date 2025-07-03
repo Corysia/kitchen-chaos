@@ -84,11 +84,12 @@ class Main {
      * @returns {StandardMaterial} The created ground material with the applied texture.
      */
     private createGroundMaterial(textureUrl: string, tileX: number, tileY: number): StandardMaterial {
+        const groundTexture = new Texture(textureUrl, Main.scene);
+        groundTexture.uScale = tileX;
+        groundTexture.vScale = tileY;
+
         const groundMaterial = new StandardMaterial("groundMaterial", Main.scene);
-        groundMaterial.diffuseTexture = new Texture(textureUrl, Main.scene);
-        // Need to cast to a Texture as BaseTexture does not have uScale or vScale
-        (groundMaterial.diffuseTexture as Texture).uScale = tileX;
-        (groundMaterial.diffuseTexture as Texture).vScale = tileY;
+        groundMaterial.diffuseTexture = groundTexture;
         return groundMaterial;
     }
 
