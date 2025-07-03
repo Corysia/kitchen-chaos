@@ -68,7 +68,7 @@ class Main {
         ground.position = new Vector3(0, 0, 0);
 
         const groundMaterial = new StandardMaterial("groundMaterial", scene);
-        const groundTexture = new Texture("public/textures/ButtonBackground.png", scene);
+        const groundTexture = new Texture("/textures/ButtonBackground.png", scene);
         groundTexture.uScale = 50;
         groundTexture.vScale = 50;
         groundMaterial.diffuseTexture = groundTexture;
