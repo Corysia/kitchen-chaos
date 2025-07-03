@@ -1,4 +1,4 @@
-import { Scene, Engine, FreeCamera, HemisphericLight, MeshBuilder, Vector3 } from "@babylonjs/core";
+import { Scene, Engine, FreeCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
 import "@babylonjs/inspector";
 
 class Main {
@@ -47,7 +47,7 @@ class Main {
         let scene = new Scene(engine);
 
         // This creates and positions a free camera (non-mesh)
-        let camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
+        let camera = new FreeCamera("camera1", new Vector3(0, 3, -3), scene);
 
         // This targets the camera to scene origin
         camera.setTarget(Vector3.Zero());
@@ -61,17 +61,18 @@ class Main {
         // Default intensity is 1. Let's dim the light a small amount
         light.intensity = 0.7;
 
-        // Our built-in 'sphere' shape. Params: name, options, scene
-        let sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, scene);
-
-        // Move the sphere upward 1/2 its height
-        sphere.position.y = 1;
-
         // Our built-in 'ground' shape. Params: name, options, scene
-        let ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
+        let ground = MeshBuilder.CreateGround("ground", { width: 5, height: 5 }, scene);
 
-        // Move the ground down
-        ground.position.y = 0;
+        // Move the ground to the origin
+        ground.position = new Vector3(0, 0, 0);
+
+        const groundMaterial = new StandardMaterial("groundMaterial", scene);
+        groundMaterial.diffuseTexture = new Texture("public/textures/buttonbackground.png", scene);
+        groundMaterial.diffuseTexture.uScale = 50.0;
+        groundMaterial.diffuseTexture.vScale = 50.0;
+        groundMaterial.diffuseTexture.hasAlpha = false;
+        ground.material = groundMaterial;;
 
         return scene;
     }
