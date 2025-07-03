@@ -5,6 +5,13 @@ class Main {
 
     static engine: Engine;
     static scene: Scene;
+
+    /**
+     * Constructor for the Main class.
+     *
+     * Creates a new Engine and Scene, and appends a canvas to the body.
+     * Also sets up event listeners for resizing the window and toggling fullscreen and the debug layer.
+     */
     constructor() {
         let canvas = document.createElement("canvas");
         canvas.style.width = "100%";
@@ -44,10 +51,10 @@ class Main {
 
     public createScene(engine: Engine, canvas: HTMLCanvasElement): Scene {
         // This creates a basic Babylon Scene object (non-mesh)
-        let scene = new Scene(engine);
+        const scene = new Scene(engine);
 
         // This creates and positions a free camera (non-mesh)
-        let camera = new FreeCamera("camera1", new Vector3(0, 3, -3), scene);
+        const camera = new FreeCamera("camera1", new Vector3(0, 3, -3), scene);
 
         // This targets the camera to scene origin
         camera.setTarget(Vector3.Zero());
@@ -56,41 +63,51 @@ class Main {
         camera.attachControl(canvas, true);
 
         // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-        let light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
+        const light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
 
         // Default intensity is 1. Let's dim the light a small amount
         light.intensity = 0.7;
 
-        // Our built-in 'ground' shape. Params: name, options, scene
-        this.createGround();
-
+        this.createGround(5, 5, "./textures/ButtonBackground.png", 10, 10);
         return scene;
     }
 
-    /**
-     * Creates and returns a StandardMaterial for the ground with a diffuse texture.
-     * The texture is scaled to repeat 50 times along both the U and V axes.
-     *
-     * @returns {StandardMaterial} The configured ground material.
-     */
 
-    private createGroundMaterial(): StandardMaterial {
+    /**
+     * Creates and returns a standard material with a diffuse texture for the ground.
+     * The texture is scaled to repeat tileX times along the U axis and tileY times along the V axis.
+     *
+     * @param {string} textureUrl The URL of the diffuse texture.
+     * @param {number} tileX The number of times to repeat the texture along the U axis.
+     * @param {number} tileY The number of times to repeat the texture along the V axis.
+     *
+     * @returns {StandardMaterial} The created ground material with the applied texture.
+     */
+    private createGroundMaterial(textureUrl: string, tileX: number, tileY: number): StandardMaterial {
         const groundMaterial = new StandardMaterial("groundMaterial", Main.scene);
-        groundMaterial.diffuseTexture = new Texture("./textures/ButtonBackground.png", Main.scene);
-        (groundMaterial.diffuseTexture as Texture).uScale = 50;
-        (groundMaterial.diffuseTexture as Texture).vScale = 50;
+        groundMaterial.diffuseTexture = new Texture(textureUrl, Main.scene);
+        // Need to cast to a Texture as BaseTexture does not have uScale or vScale
+        (groundMaterial.diffuseTexture as Texture).uScale = tileX;
+        (groundMaterial.diffuseTexture as Texture).vScale = tileY;
         return groundMaterial;
     }
 
     /**
-     * Creates and returns a GroundMesh for the scene, with the
-     * StandardMaterial returned by createGroundMaterial.
+     * Creates and returns a ground mesh with a standard material that has a diffuse texture.
+     * The ground mesh is created with MeshBuilder.CreateGround() and the texture is scaled to repeat tileX times along the U axis and tileY times along the V axis.
      *
-     * @returns {GroundMesh} The created and configured ground mesh.
+     * @param {number} width The width of the ground mesh.
+     * @param {number} height The height of the ground mesh.
+     * @param {string} textureUrl The URL of the diffuse texture.
+     * @param {number} tileX The number of times to repeat the texture along the U axis.
+     * @param {number} tileY The number of times to repeat the texture along the V axis.
+     *
+     * @returns {GroundMesh} The created ground mesh.
      */
-    private createGround(): GroundMesh {
-        let ground = MeshBuilder.CreateGround("ground", { width: 5, height: 5 }, Main.scene);
-        ground.material = this.createGroundMaterial();
+    private createGround(width: number, height: number, textureUrl: string, tileX: number, tileY: number): GroundMesh {
+        const ground = MeshBuilder.CreateGround("ground", { width: width, height: height }, Main.scene);
+        ground.position = new Vector3(0, 0, 0);
+        ground.material = this.createGroundMaterial(textureUrl, tileX, tileY);
         return ground;
     }
 }
