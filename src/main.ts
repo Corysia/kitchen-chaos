@@ -1,4 +1,4 @@
-import { Scene, Engine, FreeCamera, GroundMesh, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3, SceneLoader, ImportMeshAsync } from "@babylonjs/core";
+import { Scene, Engine, FreeCamera, GroundMesh, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3, ImportMeshAsync } from "@babylonjs/core";
 import "@babylonjs/inspector";
 
 class Main {
