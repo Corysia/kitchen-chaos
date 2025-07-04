@@ -3,39 +3,73 @@ import { Entity } from "./Entity";
 import { StageManager } from "./StageManager";
 import { Logger } from "./Logger";
 
-export class Node implements Entity {
+export abstract class Node implements Entity {
     private _onBeforeRenderObserver: Observer<Scene> | undefined;
     private _onAfterRenderObserver: Observer<Scene> | undefined;
     private _enabled = true;
+
+    /**
+     * Constructs a new Node instance and initializes observers for
+     * the scene's render events. The Node is set to start immediately
+     * upon creation.
+     *
+     * @memberof Node
+     */
     public constructor() {
         Logger.debug("Node::constructor()");
-        const scene = StageManager.instance.scene;
+        const scene = StageManager.scene;
         this._onBeforeRenderObserver = scene.onBeforeRenderObservable.add(this.update);
         this._onAfterRenderObserver = scene.onAfterRenderObservable.add(this.lateUpdate);
         this.start();
     }
 
+    /**
+     * Starts the node.
+     * 
+     * This method is called once the node is enabled and the scene is ready.
+     * It is meant to be overridden by subclasses to implement initialization
+     * code that requires the scene to be ready.
+     * 
+     * @memberof Node
+     */
     public start(): void {
         Logger.debug("Node::start()");
     }
 
+    /**
+     * Updates the node.
+     * 
+     * This method is called once every frame just before the scene is rendered.
+     * It is meant to be overridden by subclasses to implement logic that
+     * should be executed every frame.
+     * 
+     * @memberof Node
+     */
     public update(): void {
         Logger.debug("Node::update()");
-        // TODO document why this method 'update' is empty
     }
 
+    /**
+     * Updates the node late.
+     * 
+     * This method is called once every frame just after the scene has been
+     * rendered. It is meant to be overridden by subclasses to implement
+     * logic that should be executed every frame after all other game logic
+     * has been executed.
+     * 
+     * @memberof Node
+     */
     public lateUpdate(): void {
         Logger.debug("Node::lateUpdate()");
-        // TODO:: document why this method 'lateUpdate' is empty
     }
 
     /**
      * Destroys the node.
+     * TODO: Implement this method to clean up any resources used by the node.
      */
     public destroy(): void {
         Logger.debug("Node::destroy()");
         this.enabled = false;
-        // TODO: isn't there a dispose that needs to be called?
     }
 
     /**
@@ -47,7 +81,7 @@ export class Node implements Entity {
      */
     public set enabled(value: boolean) {
         Logger.debug(`Node::enabled(${value})`);
-        const scene = StageManager.instance.scene;
+        const scene = StageManager.scene;
         if (this._enabled === value) {
             return;
         }

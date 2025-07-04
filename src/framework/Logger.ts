@@ -135,7 +135,6 @@ export class Logger {
             console.groupEnd();
     }
 
-    // TODO: understand how this works
     public static trace(message?: any, ...optionalParams: any[]): void {
         if (!Logger.production)
             if (Logger.logLevel >= LogLevel.TRACE)

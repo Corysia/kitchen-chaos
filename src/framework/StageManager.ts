@@ -61,7 +61,7 @@ export class StageManager {
     private static createEngine(canvas: HTMLCanvasElement): Engine {
         if (canvas == null || canvas === undefined) {
             throw new Error("Canvas is null or undefined");
-        }// TODO: create a WebGPU engine
+        }// TODO: create a WebGPU engine if possible, fall back to webgl
         try {
             return new Engine(canvas, true);
         } catch (error) {
@@ -118,7 +118,7 @@ export class StageManager {
      * 
      * @returns {Engine} The BabylonJS engine associated with the StageManager.
      */
-    public get engine(): Engine {
+    public static get engine(): Engine {
         return StageManager._instance._engine;
     }
 
@@ -127,7 +127,7 @@ export class StageManager {
      * 
      * @returns {Scene} The BabylonJS Scene associated with the StageManager.
      */
-    public get scene(): Scene {
+    public static get scene(): Scene {
         return StageManager._instance._currentScene;
     }
 
@@ -136,7 +136,7 @@ export class StageManager {
      * 
      * @returns {HTMLCanvasElement} The HTMLCanvasElement associated with the StageManager.
      */
-    public get canvas(): HTMLCanvasElement {
+    public static get canvas(): HTMLCanvasElement {
         return StageManager._instance._canvas;
     }
 
@@ -151,8 +151,8 @@ export class StageManager {
      */
     public static startRenderLoop() {
         try {
-            StageManager.instance.engine.runRenderLoop(() => {
-                StageManager.instance.scene.render();
+            StageManager.engine.runRenderLoop(() => {
+                StageManager.scene.render();
             });
         } catch (error) {
             Logger.error("Failed to start render loop:", error);
@@ -172,7 +172,7 @@ export class StageManager {
 
     public static stopRenderLoop() {
         try {
-            StageManager.instance.engine.stopRenderLoop();
+            StageManager.engine.stopRenderLoop();
         } catch (error) {
             Logger.error("Failed to stop render loop:", error);
             Logger.trace(error);
@@ -201,14 +201,20 @@ export class StageManager {
         let stage = StageManager.findStage(name);
         if (stage != undefined) {
             let scene = stage.scene;
-            if (scene != undefined) {
-                let oldScene = StageManager.instance.scene;
-                StageManager.stopRenderLoop();
-                oldScene.dispose();
-                StageManager.instance._currentScene = scene;
-                StageManager.startRenderLoop();
+            if (scene == undefined) {
+                stage.load();
+                if (stage.scene == undefined) {
+                    Logger.error("Stage not loaded: ", name);
+                    return;
+                }
+                else
+                    scene = stage.scene;
             }
-            else Logger.error("Scene not found within Stage ", name);
+            let oldScene = StageManager.scene;
+            StageManager.stopRenderLoop();
+            oldScene.dispose();
+            StageManager.instance._currentScene = scene;
+            StageManager.startRenderLoop();
         }
         else Logger.error("Stage not found: ", name);
     }

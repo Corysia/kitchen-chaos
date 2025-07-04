@@ -14,31 +14,25 @@ class Main {
 
     public start(): void {
         Logger.debug("Main::start()");
-        let gameStage = new GameStage();
-        gameStage.load();
-        StageManager.addStage("GameStage", gameStage)
+        StageManager.addStage("GameStage", new GameStage)
         StageManager.setActiveStage("GameStage");
         StageManager.startRenderLoop();
     }
 
     private addEventListeners() {
-        let manager = StageManager.instance;
-        let engine = manager.engine;
-        let scene = manager.scene;
-
         window.addEventListener("keydown", (ev) => {
             switch (ev.code) {
                 case "KeyF":
                     if (ev.shiftKey && ev.ctrlKey && ev.altKey) {
-                        engine.switchFullscreen(false);
+                        StageManager.engine.switchFullscreen(false);
                     }
                     break;
                 case "KeyI":
                     if (ev.shiftKey && ev.ctrlKey && ev.altKey) {
-                        if (scene.debugLayer.isVisible()) {
-                            scene.debugLayer.hide();
+                        if (StageManager.scene.debugLayer.isVisible()) {
+                            StageManager.scene.debugLayer.hide();
                         } else {
-                            scene.debugLayer.show();
+                            StageManager.scene.debugLayer.show();
                         }
                     }
                     break;

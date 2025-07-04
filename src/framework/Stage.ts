@@ -1,10 +1,28 @@
 import { Camera, Engine, FreeCamera, HemisphericLight, MeshBuilder, Scene, Vector3 } from "@babylonjs/core";
+import { StageManager } from "./StageManager";
 
 export abstract class Stage {
 
     private _camera: Camera | undefined;
 
     private _scene: Scene | undefined;
+
+    /**
+     * Loads the scene asynchronously.
+     *
+     * Displays a loading UI and detaches control from the current scene.
+     * Then it calls the createScene method to create the scene.
+     * Finally, it hides the loading UI.
+     *
+     * @async
+     * @returns {Promise<void>} Resolves when the scene has been loaded.
+     */
+    public async load(): Promise<void> {
+        StageManager.engine.displayLoadingUI();
+        StageManager.scene.detachControl();
+        await this.createScene(StageManager.engine, StageManager.canvas);
+        StageManager.engine.hideLoadingUI();
+    }
 
     protected async createScene(engine: Engine, canvas: HTMLCanvasElement): Promise<Scene> {
         // This creates a basic Babylon Scene object (non-mesh)

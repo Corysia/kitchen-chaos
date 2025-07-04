@@ -1,15 +1,10 @@
 import { DefaultRenderingPipeline, DirectionalLight, Engine, FreeCamera, GroundMesh, HemisphericLight, ImageProcessingPostProcess, ImportMeshAsync, MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Texture, TonemappingOperator, TonemapPostProcess, Vector3 } from "@babylonjs/core";
 import { Stage } from "./framework/Stage";
-import { StageManager } from "./framework/StageManager";
 import { Logger } from "./framework/Logger";
 
 export default class GameScene extends Stage {
 
     private _shadowGenerator: ShadowGenerator | undefined;
-
-    public async load(): Promise<void> {
-        await this.createScene(StageManager.instance.engine, StageManager.instance.canvas);
-    }
 
     protected async createScene(engine: Engine, canvas: HTMLCanvasElement): Promise<Scene> {
         // This creates a basic Babylon Scene object (non-mesh)
@@ -47,8 +42,7 @@ export default class GameScene extends Stage {
         this._shadowGenerator = shadowGenerator;
 
         this.applyPostProcessingEffects();
-
-
+        await super.scene.whenReadyAsync();
         return super.scene;
     }
 
@@ -117,7 +111,7 @@ export default class GameScene extends Stage {
         StoveCounter.receiveShadows = true;
         this._shadowGenerator?.addShadowCaster(StoveCounter)
 
-        super.scene.getMeshByName("StoveOnVisual")?.setEnabled(true);
+        super.scene.getMeshByName("StoveOnVisual")?.setEnabled(false);
     }
 
     /**
