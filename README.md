@@ -11,4 +11,6 @@ The game is built with [Babylon.js](https://www.babylonjs.com/) and [TypeScript]
 
 ## Play for Free
 
+This game is still in the very early stages of development.
+
 Click here to [play the game](https://corysia.github.io/kitchen-chaos/)

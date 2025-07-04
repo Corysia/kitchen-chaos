@@ -1,10 +1,12 @@
-import { Scene, Engine, FreeCamera, GroundMesh, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3, ImportMeshAsync } from "@babylonjs/core";
+import { Scene, Engine, FreeCamera, GroundMesh, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3, ImportMeshAsync, TonemapPostProcess, TonemappingOperator, ShadowGenerator, DirectionalLight, ImageProcessingPostProcess, DefaultRenderingPipeline } from "@babylonjs/core";
 import "@babylonjs/inspector";
 
 class Main {
 
     static engine: Engine;
     static scene: Scene;
+    static camera: FreeCamera
+    static shadowGenerator: ShadowGenerator
 
     /**
      * Constructor for the Main class.
@@ -20,6 +22,10 @@ class Main {
         document.body.appendChild(canvas);
         Main.engine = new Engine(canvas, true);
         Main.scene = this.createScene(Main.engine, canvas);
+
+        this.createShadows();
+        this.applyPostProcessingEffects();
+
 
         window.addEventListener("resize", function () {
             Main.engine.resize();
@@ -54,25 +60,51 @@ class Main {
         const scene = new Scene(engine);
 
         // This creates and positions a free camera (non-mesh)
-        const camera = new FreeCamera("camera1", new Vector3(0, 10, -10), scene);
+        Main.camera = new FreeCamera("camera1", new Vector3(0, 10, -10), scene);
 
         // This targets the camera to scene origin
-        camera.setTarget(Vector3.Zero());
+        Main.camera.setTarget(Vector3.Zero());
 
         // This attaches the camera to the canvas
-        camera.attachControl(canvas, true);
+        Main.camera.attachControl(canvas, true);
 
         // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-        const light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
+        const hemlight = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
 
         // Default intensity is 1. Let's dim the light a small amount
-        light.intensity = 0.7;
+        hemlight.intensity = 0.7;
+
+        // light1
+        const light = new DirectionalLight("dir01", new Vector3(1, -2, 2), scene);
+        light.position = new Vector3(20, 40, 20);
+        light.intensity = 0.5;
+
 
         this.createGround(50, 50, "./textures/ButtonBackground.png", 50, 50);
 
         this.loadActors();
 
+        Main.shadowGenerator = new ShadowGenerator(1024, light);
+        Main.shadowGenerator.useExponentialShadowMap = true;
+
         return scene;
+    }
+
+    private createShadows(): void {
+        // Shadows
+
+    }
+
+    private applyPostProcessingEffects(): void {
+        let postProcess = new TonemapPostProcess("tonemap", TonemappingOperator.Photographic, 1.8, Main.camera);
+        postProcess.exposureAdjustment = 2.0;
+        let postProcess2 = new ImageProcessingPostProcess("processing", 1.0, Main.camera);
+        postProcess2.contrast = 2.0;
+        postProcess2.exposure = 0.5;
+
+        let defaultPipeline = new DefaultRenderingPipeline("default", false, Main.scene, [Main.camera]);
+        defaultPipeline.bloomEnabled = false;
+        defaultPipeline.bloomWeight = 0.1;
     }
 
     private async loadActors(): Promise<void> {
@@ -80,11 +112,31 @@ class Main {
         const PlayerVisual = result.meshes[0];
         PlayerVisual.position = new Vector3(0, 0, 0);
         PlayerVisual.rotation = new Vector3(0, 0, 0);
+        PlayerVisual.receiveShadows = true;
+        Main.shadowGenerator.addShadowCaster(PlayerVisual)
 
         result = await ImportMeshAsync("./models/ClearCounter_Visual.glb", Main.scene);
         const ClearCounter = result.meshes[0];
         ClearCounter.position = new Vector3(2, 0, 2);
         ClearCounter.rotation = new Vector3(0, 0, 0);
+        ClearCounter.receiveShadows = true;
+        Main.shadowGenerator.addShadowCaster(ClearCounter)
+
+        result = await ImportMeshAsync("./models/CuttingCounter_Visual.glb", Main.scene);
+        const CuttingCounter = result.meshes[0];
+        CuttingCounter.position = new Vector3(3.5, 0, 2);
+        CuttingCounter.rotation = new Vector3(0, 0, 0);
+        CuttingCounter.receiveShadows = true;
+        Main.shadowGenerator.addShadowCaster(CuttingCounter)
+
+        result = await ImportMeshAsync("./models/StoveCounter_Visual.glb", Main.scene);
+        const StoveCounter = result.meshes[0];
+        StoveCounter.position = new Vector3(5, 0, 2);
+        StoveCounter.rotation = new Vector3(0, 0, 0);
+        StoveCounter.receiveShadows = true;
+        Main.shadowGenerator.addShadowCaster(StoveCounter)
+
+        Main.scene.getMeshByName("StoveOnVisual")?.setEnabled(true);
     }
 
 
@@ -124,6 +176,7 @@ class Main {
         const ground = MeshBuilder.CreateGround("ground", { width: width, height: height }, Main.scene);
         ground.position = new Vector3(0, 0, 0);
         ground.material = this.createGroundMaterial(textureUrl, tileX, tileY);
+        ground.receiveShadows = true;
         return ground;
     }
 }
