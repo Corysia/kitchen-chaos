@@ -2,7 +2,7 @@ import { DefaultRenderingPipeline, DirectionalLight, Engine, FreeCamera, GroundM
 import { Stage } from "./framework/Stage";
 import { Logger } from "./framework/Logger";
 
-export default class GameScene extends Stage {
+export default class GameStage extends Stage {
 
     private _shadowGenerator: ShadowGenerator | undefined;
 
@@ -11,7 +11,7 @@ export default class GameScene extends Stage {
         super.scene = new Scene(engine);
 
         // This creates and positions a free camera (non-mesh)
-        let camera = new FreeCamera("camera1", new Vector3(0, 10, -10), super.scene);
+        const camera = new FreeCamera("camera1", new Vector3(0, 10, -10), super.scene);
 
         // This targets the camera to scene origin
         camera.setTarget(Vector3.Zero());
@@ -36,7 +36,7 @@ export default class GameScene extends Stage {
 
         this.loadActors();
 
-        let shadowGenerator = new ShadowGenerator(1024, light);
+        const shadowGenerator = new ShadowGenerator(1024, light);
         shadowGenerator.useExponentialShadowMap = true;
 
         this._shadowGenerator = shadowGenerator;
@@ -61,13 +61,13 @@ export default class GameScene extends Stage {
             Logger.error("Camera is undefined");
             return;
         }
-        let postProcess = new TonemapPostProcess("tonemap", TonemappingOperator.Photographic, 1.8, super.camera);
+        const postProcess = new TonemapPostProcess("tonemap", TonemappingOperator.Photographic, 1.8, super.camera);
         postProcess.exposureAdjustment = 2.0;
-        let postProcess2 = new ImageProcessingPostProcess("processing", 1.0, super.camera);
+        const postProcess2 = new ImageProcessingPostProcess("processing", 1.0, super.camera);
         postProcess2.contrast = 2.0;
         postProcess2.exposure = 0.5;
 
-        let defaultPipeline = new DefaultRenderingPipeline("default", false, super.scene, [super.camera]);
+        const defaultPipeline = new DefaultRenderingPipeline("default", false, super.scene, [super.camera]);
         defaultPipeline.bloomEnabled = false;
         defaultPipeline.bloomWeight = 0.1;
     }

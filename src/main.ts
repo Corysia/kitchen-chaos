@@ -12,10 +12,10 @@ class Main {
         this.addEventListeners();
     }
 
-    public start(): void {
+    public async start(): Promise<void> {
         Logger.debug("Main::start()");
         StageManager.addStage("GameStage", new GameStage)
-        StageManager.setActiveStage("GameStage");
+        await StageManager.setActiveStage("GameStage");
         StageManager.startRenderLoop();
     }
 
@@ -48,4 +48,4 @@ class Main {
 }
 
 const main = new Main();
-main.start();
+await main.start();

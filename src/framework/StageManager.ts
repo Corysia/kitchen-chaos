@@ -42,7 +42,7 @@ export class StageManager {
      */
     private static createCanvas(): HTMLCanvasElement {
         document.getElementById("canvas")?.remove();
-        let canvas = document.createElement("canvas");
+        const canvas = document.createElement("canvas");
         canvas.style.width = '100%';
         canvas.style.height = '100%';
         canvas.id = "canvas";
@@ -79,10 +79,10 @@ export class StageManager {
      */
     private static createPlaceholderScene(engine: Engine): Scene {
         // This creates a basic Babylon Scene object (non-mesh)
-        let scene = new Scene(engine);
+        const scene = new Scene(engine);
 
         // This creates and positions a free camera (non-mesh)
-        let camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
+        const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
 
         // This targets the camera to scene origin
         camera.setTarget(Vector3.Zero());
@@ -187,22 +187,24 @@ export class StageManager {
         // }
     }
 
+
     /**
-     * Sets the active stage based on its name.
+     * Sets the active stage in the StageManager to the given name.
+     * If the stage does not exist, it logs an error and does not change the active stage.
+     * If the stage is not loaded, it loads the stage and then sets it as the active stage.
+     * If the stage is loaded, it switches to that stage and starts the render loop.
+     * If the stage is not loaded and cannot be loaded, it logs an error and does not change the active stage.
+     * If the stage is loaded but cannot be set as the active stage, it logs an error and does not change the active stage.
      * 
-     * This function stops the render loop and disposes of the current scene, then
-     * sets the scene of the stage to the active scene and starts the render loop again.
-     * If the stage or scene is not found, an error is reported to the Logger.
-     * 
-     * @param {string} name - The name of the stage to be set as active.
-     * @returns void
+     * @param {string} name - The name of the stage to be set as the active stage.
+     * @returns {Promise<void>} Resolves when the stage has been set as the active stage.
      */
-    public static setActiveStage(name: string) {
-        let stage = StageManager.findStage(name);
+    public static async setActiveStage(name: string): Promise<void> {
+        const stage = StageManager.findStage(name);
         if (stage != undefined) {
             let scene = stage.scene;
             if (scene == undefined) {
-                stage.load();
+                await stage.load();
                 if (stage.scene == undefined) {
                     Logger.error("Stage not loaded: ", name);
                     return;
@@ -210,7 +212,7 @@ export class StageManager {
                 else
                     scene = stage.scene;
             }
-            let oldScene = StageManager.scene;
+            const oldScene = StageManager.scene;
             StageManager.stopRenderLoop();
             oldScene.dispose();
             StageManager.instance._currentScene = scene;
