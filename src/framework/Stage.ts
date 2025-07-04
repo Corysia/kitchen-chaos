@@ -1,10 +1,12 @@
 import { Camera, Engine, FreeCamera, HemisphericLight, MeshBuilder, Scene, Vector3 } from "@babylonjs/core";
 import { StageManager } from "./StageManager";
 
+/**
+ * The Stage class is an abstract class that provides a basic structure for creating and managing a BabylonJS scene.
+ */
 export abstract class Stage {
 
     private _camera: Camera | undefined;
-
     private _scene: Scene | undefined;
 
     /**
@@ -24,6 +26,14 @@ export abstract class Stage {
         StageManager.engine.hideLoadingUI();
     }
 
+    /**
+     * Creates and returns a basic scene with a camera, light, sphere, and ground mesh.
+     *
+     * @param {Engine} engine The BabylonJS engine for the scene.
+     * @param {HTMLCanvasElement} canvas The HTML canvas element to associate with the scene.
+     *
+     * @returns {Promise<Scene>} A promise that resolves with the created scene.
+     */
     protected async createScene(engine: Engine, canvas: HTMLCanvasElement): Promise<Scene> {
         // This creates a basic Babylon Scene object (non-mesh)
         const scene = new Scene(engine);
@@ -55,16 +65,37 @@ export abstract class Stage {
         return scene;
     }
 
+    /**
+     * Gets the camera associated with the stage.
+     *
+     * @returns {Camera | undefined} The camera associated with the stage, or undefined if the stage is not ready.
+     */
     protected get camera(): Camera | undefined {
         return this._camera;
     }
+    /**
+     * Sets the camera associated with the stage.
+     *
+     * @param {Camera | undefined} value The camera to associate with the stage, or undefined to remove the camera.
+     */
     protected set camera(value: Camera | undefined) {
         this._camera = value;
     }
 
+
+    /**
+     * Gets the BabylonJS scene associated with the stage.
+     *
+     * @returns {Scene | undefined} The scene associated with the stage, or undefined if the scene is not set.
+     */
     public get scene(): Scene | undefined {
         return this._scene;
     }
+    /**
+     * Sets the BabylonJS scene associated with the stage.
+     *
+     * @param {Scene | undefined} value The scene to associate with the stage, or undefined to remove the scene.
+     */
     public set scene(value: Scene | undefined) {
         this._scene = value;
     }

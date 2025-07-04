@@ -2,6 +2,11 @@ import { Engine, FreeCamera, Scene, Vector3 } from "@babylonjs/core";
 import { Logger } from "./Logger";
 import { Stage } from "./Stage";
 
+/**
+ * The StageManagerclass is a singleton that manages the rendering of 3D scenes using the BabylonJS engine. 
+ * It creates a canvas element, engine, and scene, and provides methods for resizing the engine, 
+ * starting and stopping the render loop, and managing stages.
+ */
 export class StageManager {
 
     private static _instance: StageManager;

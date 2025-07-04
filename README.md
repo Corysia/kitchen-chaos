@@ -2,6 +2,8 @@
 
 - [Kitchen Chaos](#kitchen-chaos)
   - [Play for Free](#play-for-free)
+    - [Controls](#controls)
+      - [Future controls:](#future-controls)
   - [Getting Started](#getting-started)
   - [Installation](#installation)
   - [Development](#development)
@@ -16,6 +18,16 @@ The game is built with [Babylon.js](https://www.babylonjs.com/) and [TypeScript]
 ## Play for Free
 
 This game is still in the _**very early**_ stages of development, so don't expect to see much yet.  But if you want to try it out, click here to [play the game](https://corysia.github.io/kitchen-chaos/).
+
+### Controls
+
+- Toggle Fullscreen - `shift-ctrl-alt-F`
+- Debug inspector - `shift-ctrl-alt-i`
+
+#### Future controls:
+
+- WASD to move
+- E to interact
 
 ## Getting Started
 
@@ -38,7 +50,7 @@ Run the following command to start the development server
 npm run dev
 ```
 
-This will start a local server.
+This will start a local server and provide a URL to connect to.
 
 ## Debugging in Babylon.js with Visual Studio Code
 
