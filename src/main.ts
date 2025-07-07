@@ -1,6 +1,6 @@
 import "@babylonjs/inspector";
 import { Logger, LogLevel, LogTimestampFormat } from "./framework/Logger";
-import GameStage from "./GameStage";
+import GameStage from "./stages/GameStage";
 import { StageManager } from "./framework/StageManager";
 
 class Main {

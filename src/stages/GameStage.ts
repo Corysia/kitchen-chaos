@@ -1,6 +1,6 @@
-import { DefaultRenderingPipeline, DirectionalLight, Engine, FreeCamera, GroundMesh, HemisphericLight, ImageProcessingPostProcess, ImportMeshAsync, MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Texture, TonemappingOperator, TonemapPostProcess, Vector3 } from "@babylonjs/core";
-import { Stage } from "./framework/Stage";
-import { Logger } from "./framework/Logger";
+import { Color4, DefaultRenderingPipeline, DirectionalLight, Engine, FreeCamera, FxaaPostProcess, GroundMesh, HemisphericLight, ImageProcessingPostProcess, ImportMeshAsync, MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Texture, TonemappingOperator, TonemapPostProcess, Vector3 } from "@babylonjs/core";
+import { Stage } from "../framework/Stage";
+import { Logger } from "../framework/Logger";
 
 export default class GameStage extends Stage {
 
@@ -12,6 +12,7 @@ export default class GameStage extends Stage {
 
         // This creates and positions a free camera (non-mesh)
         const camera = new FreeCamera("camera1", new Vector3(0, 10, -10), super.scene);
+        // const camera = new FreeCamera("camera1", new Vector3(0, 21.5, -21.3), super.scene);
 
         // This targets the camera to scene origin
         camera.setTarget(Vector3.Zero());
@@ -28,8 +29,8 @@ export default class GameStage extends Stage {
         hemlight.intensity = 0.7;
 
         // light1
-        const light = new DirectionalLight("dir01", new Vector3(1, -2, 2), super.scene);
-        light.position = new Vector3(20, 40, 20);
+        const light = new DirectionalLight("dir01", new Vector3(50, -30, 0), super.scene);
+        light.position = new Vector3(0, 180, -20);
         light.intensity = 0.5;
 
         this.createGround(50, 50, "./textures/ButtonBackground.png", 50, 50);
@@ -61,15 +62,23 @@ export default class GameStage extends Stage {
             Logger.error("Camera is undefined");
             return;
         }
-        const postProcess = new TonemapPostProcess("tonemap", TonemappingOperator.Photographic, 1.8, super.camera);
-        postProcess.exposureAdjustment = 2.0;
-        const postProcess2 = new ImageProcessingPostProcess("processing", 1.0, super.camera);
-        postProcess2.contrast = 2.0;
-        postProcess2.exposure = 0.5;
+        const postProcess = new ImageProcessingPostProcess("processing", 1.0, super.camera);
+        postProcess.contrast = 2.0;
+        postProcess.exposure = 0.6;
+        postProcess.toneMappingEnabled = true;
+        postProcess.toneMappingType = TonemappingOperator.Photographic; // Use Hable tone mapping operator
+        postProcess.vignetteEnabled = true; // Enable vignette effect
+        postProcess.vignetteColor = new Color4(0, 0, 0, 1); // Color of the vignette effect
+        postProcess.vignetteWeight = 0.4; // Weight of the vignette effect
 
-        const defaultPipeline = new DefaultRenderingPipeline("default", false, super.scene, [super.camera]);
-        defaultPipeline.bloomEnabled = false;
-        defaultPipeline.bloomWeight = 0.1;
+        const fxaaPostProcess = new FxaaPostProcess("fxaa", 4.0, super.camera);
+        fxaaPostProcess.apply();
+
+        const defaultPipeline = new DefaultRenderingPipeline("ssao", true, super.scene, [super.camera]);
+        defaultPipeline.bloomEnabled = true;
+        defaultPipeline.bloomWeight = 1.0; // Weight of the bloom effect
+        defaultPipeline.bloomThreshold = 0.95; // Threshold for bloom effect
+        defaultPipeline.fxaaEnabled = true; // Enable FXAA for anti-aliasing
     }
 
     /**
@@ -111,7 +120,7 @@ export default class GameStage extends Stage {
         StoveCounter.receiveShadows = true;
         this._shadowGenerator?.addShadowCaster(StoveCounter)
 
-        super.scene.getMeshByName("StoveOnVisual")?.setEnabled(false);
+        super.scene.getMeshByName("StoveOnVisual")?.setEnabled(true);
     }
 
     /**
