@@ -1,4 +1,4 @@
-import { Color4, DefaultRenderingPipeline, DirectionalLight, Engine, FreeCamera, FxaaPostProcess, GroundMesh, HemisphericLight, ImageProcessingPostProcess, ImportMeshAsync, MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Texture, TonemappingOperator, TonemapPostProcess, Vector3 } from "@babylonjs/core";
+import { Color4, DefaultRenderingPipeline, DirectionalLight, Engine, FreeCamera, FxaaPostProcess, GroundMesh, HemisphericLight, ImageProcessingPostProcess, ImportMeshAsync, MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Texture, TonemappingOperator, Vector3 } from "@babylonjs/core";
 import { Stage } from "../framework/Stage";
 import { Logger } from "../framework/Logger";
 
@@ -94,29 +94,29 @@ export default class GameStage extends Stage {
         }
         let result = await ImportMeshAsync("./models/PlayerVisual.glb", super.scene);
         const PlayerVisual = result.meshes[0];
-        PlayerVisual.position = new Vector3(0, 0, 0);
-        PlayerVisual.rotation = new Vector3(0, 0, 0);
+        PlayerVisual.position = Vector3.Zero();;
+        PlayerVisual.rotation = Vector3.Zero();;
         PlayerVisual.receiveShadows = true;
         this._shadowGenerator?.addShadowCaster(PlayerVisual)
 
         result = await ImportMeshAsync("./models/ClearCounter_Visual.glb", super.scene);
         const ClearCounter = result.meshes[0];
         ClearCounter.position = new Vector3(2, 0, 2);
-        ClearCounter.rotation = new Vector3(0, 0, 0);
+        ClearCounter.rotation = Vector3.Zero();;
         ClearCounter.receiveShadows = true;
         this._shadowGenerator?.addShadowCaster(ClearCounter)
 
         result = await ImportMeshAsync("./models/CuttingCounter_Visual.glb", super.scene);
         const CuttingCounter = result.meshes[0];
         CuttingCounter.position = new Vector3(3.5, 0, 2);
-        CuttingCounter.rotation = new Vector3(0, 0, 0);
+        CuttingCounter.rotation = Vector3.Zero();;
         CuttingCounter.receiveShadows = true;
         this._shadowGenerator?.addShadowCaster(CuttingCounter)
 
         result = await ImportMeshAsync("./models/StoveCounter_Visual.glb", super.scene);
         const StoveCounter = result.meshes[0];
         StoveCounter.position = new Vector3(5, 0, 2);
-        StoveCounter.rotation = new Vector3(0, 0, 0);
+        StoveCounter.rotation = Vector3.Zero();;
         StoveCounter.receiveShadows = true;
         this._shadowGenerator?.addShadowCaster(StoveCounter)
 
@@ -157,7 +157,7 @@ export default class GameStage extends Stage {
      */
     private createGround(width: number, height: number, textureUrl: string, tileX: number, tileY: number): GroundMesh {
         const ground = MeshBuilder.CreateGround("ground", { width: width, height: height }, super.scene);
-        ground.position = new Vector3(0, 0, 0);
+        ground.position = Vector3.Zero();
         ground.material = this.createGroundMaterial(textureUrl, tileX, tileY);
         ground.receiveShadows = true;
         return ground;
