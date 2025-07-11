@@ -8,13 +8,15 @@
     "host": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist node_modules"
+    "clean": "rm -rf dist node_modules",
+    "test": "vitest"
   },
   "devDependencies": {
     "@babylonjs/core": "^8.14.0",
     "@babylonjs/inspector": "^8.14.0",
     "@types/node": "^24.0.10",
     "typescript": "^5.2.2",
-    "vite": "^7.0.0"
+    "vite": "^7.0.0",
+    "vitest": "^3.2.4"
   }
 }
