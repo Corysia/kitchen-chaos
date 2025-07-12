@@ -192,7 +192,6 @@ export class StageManager {
         // }
     }
 
-
     /**
      * Sets the active stage in the StageManager to the given name.
      * If the stage does not exist, it logs an error and does not change the active stage.

@@ -1,13 +1,17 @@
 import { Camera, Engine, FreeCamera, HemisphericLight, MeshBuilder, Scene, Vector3 } from "@babylonjs/core";
 import { StageManager } from "./StageManager";
+import { GameObject } from "./GameObject";
+import { Logger } from "./Logger";
+import { Lifecycle } from "./Lifecycle";
 
 /**
  * The Stage class is an abstract class that provides a basic structure for creating and managing a BabylonJS scene.
  */
-export abstract class Stage {
+export abstract class Stage implements Lifecycle {
 
     private _camera: Camera | undefined;
     private _scene: Scene | undefined;
+    private _gameObjects: Array<GameObject> = new Array<GameObject>();
 
     /**
      * Loads the scene asynchronously.
@@ -73,6 +77,7 @@ export abstract class Stage {
     protected get camera(): Camera | undefined {
         return this._camera;
     }
+
     /**
      * Sets the camera associated with the stage.
      *
@@ -82,7 +87,6 @@ export abstract class Stage {
         this._camera = value;
     }
 
-
     /**
      * Gets the BabylonJS scene associated with the stage.
      *
@@ -91,6 +95,7 @@ export abstract class Stage {
     public get scene(): Scene | undefined {
         return this._scene;
     }
+
     /**
      * Sets the BabylonJS scene associated with the stage.
      *
@@ -98,5 +103,95 @@ export abstract class Stage {
      */
     public set scene(value: Scene | undefined) {
         this._scene = value;
+    }
+
+    /**
+     * Adds a GameObject to the stage.
+     *
+     * This method appends the specified GameObject to the internal list of game objects.
+     *
+     * @param {GameObject} gameObject - The GameObject to be added to the stage.
+     * @returns {void}
+     */
+    public addNode(gameObject: GameObject): void {
+        this._gameObjects.push(gameObject);
+    }
+
+    /**
+     * Removes the specified GameObject from the stage.
+     *
+     * This method filters out the given GameObject from the internal list of game objects.
+     * It also calls the destroy method on the GameObject to clean up any resources it uses.
+     *
+     * @param {GameObject} gameObject - The GameObject to remove from the stage.
+     */
+    public removeNode(gameObject: GameObject): void {
+        this._gameObjects = this._gameObjects.filter(n => n !== gameObject);
+        gameObject.destroy();
+    }
+
+    /**
+     * Calls the awake method on all GameObjects in the stage.
+     *
+     * This method is called once the stage is initialized and ready.
+     * It is meant to be overridden by subclasses to implement logic
+     * that should be executed once the stage becomes active and
+     * all GameObjects are prepared.
+     *
+     * @memberof Stage
+     */
+    awake(): void {
+        Logger.debug("Stage::awake()");
+        for (const gameObject of this._gameObjects) {
+            gameObject.awake();
+        }
+    }
+
+    /**
+     * Starts all GameObjects in the stage.
+     *
+     * This method calls the start method on all GameObjects in the stage. It is
+     * meant to be overridden by subclasses to implement logic that should be
+     * executed once all GameObjects have been initialized.
+     *
+     * @memberof Stage
+     */
+    start(): void {
+        Logger.debug("Stage::start()");
+        for (const gameObject of this._gameObjects) {
+            gameObject.start();
+        }
+    }
+
+    /**
+     * Calls the update method on all GameObjects in the stage.
+     *
+     * This method is called once every frame just before the scene is rendered.
+     * It is meant to be overridden by subclasses to implement logic that
+     * should be executed every frame.
+     * 
+     * @memberof Stage
+     */
+    update(): void {
+        Logger.debug("Stage::update()");
+        for (const gameObject of this._gameObjects) {
+            gameObject.update();
+        }
+    }
+
+    /**
+     * Calls the lateUpdate method on all GameObjects in the stage.
+     *
+     * This method is called once every frame just after the scene has been rendered.
+     * It is meant to be overridden by subclasses to implement logic that
+     * should be executed every frame after all other game logic has been executed.
+     * 
+     * @memberof Stage
+     */
+    lateUpdate(): void {
+        Logger.debug("Stage::lateUpdate()");
+        for (const gameObject of this._gameObjects) {
+            gameObject.lateUpdate();
+        }
     }
 }
