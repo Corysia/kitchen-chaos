@@ -2,7 +2,7 @@ import { Camera, Engine, FreeCamera, HemisphericLight, MeshBuilder, Scene, Vecto
 import { StageManager } from "./StageManager";
 import { GameObject } from "./GameObject";
 import { Logger } from "./Logger";
-import { Lifecycle } from "./Lifecycle";
+import Lifecycle from "./interfaces/Lifecycle";
 
 /**
  * The Stage class is an abstract class that provides a basic structure for creating and managing a BabylonJS scene.
@@ -113,8 +113,12 @@ export abstract class Stage implements Lifecycle {
      * @param {GameObject} gameObject - The GameObject to be added to the stage.
      * @returns {void}
      */
-    public addNode(gameObject: GameObject): void {
+    public add(gameObject: GameObject): void {
         this._gameObjects.push(gameObject);
+    }
+
+    public find(id: string): GameObject | undefined {
+        return this._gameObjects.find(n => n.id === id);
     }
 
     /**
@@ -125,7 +129,7 @@ export abstract class Stage implements Lifecycle {
      *
      * @param {GameObject} gameObject - The GameObject to remove from the stage.
      */
-    public removeNode(gameObject: GameObject): void {
+    public remove(gameObject: GameObject): void {
         this._gameObjects = this._gameObjects.filter(n => n !== gameObject);
         gameObject.destroy();
     }

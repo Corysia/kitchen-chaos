@@ -11,6 +11,7 @@ export class StageManager {
 
     private static _instance: StageManager;
     private _currentScene: Scene;
+    private _currentStage: Stage | undefined;
     private readonly _engine: Engine;
     private readonly _canvas: HTMLCanvasElement;
     private readonly _stageMap: Map<string, Stage>;
@@ -155,6 +156,14 @@ export class StageManager {
      * @returns void
      */
     public static startRenderLoop() {
+        this._instance._currentScene.getNodes().forEach((node) => {
+            node.metadata = new Map<string, any>();
+            let id = node.metadata.get("gameObject");
+            if (id) {
+                let gameObject = this._instance._currentStage?.  ._gameObjects.find(g => g.id == id);
+            }
+        })
+
         try {
             StageManager.engine.runRenderLoop(() => {
                 StageManager.scene.render();
@@ -164,7 +173,6 @@ export class StageManager {
             Logger.trace(error);
         }
     }
-
 
     /**
      * Stops the render loop and animations.

@@ -1,4 +1,4 @@
-export interface Lifecycle {
+export default interface Lifecycle {
     awake(): void;
     start(): void;
     update(): void;
