@@ -18,26 +18,26 @@ export class SceneManager {
     private static _instance: SceneManager | null = null;
 
     /** The Babylon.js engine instance */
-    engine: Engine;
+    public engine: Engine;
     
     /** The main game scene */
-    scene!: Scene;
+    public scene!: Scene;
     
     /** Array of all active GameObjects in the scene */
-    gameObjects: GameObject[] = [];
+    public gameObjects: GameObject[] = [];
     
     /** Flag indicating if the game has started */
-    started = false;
+    public started = false;
     
     /** Global input system for handling user input */
-    inputSystem!: InputSystem;
+    public inputSystem!: InputSystem;
 
     /**
      * Creates a new SceneManager instance (singleton pattern)
      * @param engine The Babylon.js engine to use
      * @throws Error if an instance already exists
      */
-    constructor(engine: Engine) {
+    private constructor(engine: Engine) {
         if (SceneManager._instance) {
             throw new Error("SceneManager instance already exists");
         }
@@ -50,7 +50,7 @@ export class SceneManager {
      * @returns The SceneManager instance
      * @throws Error if SceneManager has not been initialized
      */
-    static get instance(): SceneManager {
+    public static get instance(): SceneManager {
         if (!SceneManager._instance) {
             throw new Error("SceneManager has not been initialized");
         }
@@ -58,11 +58,25 @@ export class SceneManager {
     }
 
     /**
+     * Initializes the singleton SceneManager instance
+     * @param engine The Babylon.js engine to use
+     * @returns The initialized SceneManager instance
+     * @throws Error if an instance already exists
+     */
+    public static initialize(engine: Engine): SceneManager {
+        if (SceneManager._instance) {
+            throw new Error("SceneManager instance already exists");
+        }
+        const instance = new SceneManager(engine);
+        return instance;
+    }
+
+    /**
      * Creates and initializes the main game scene.
      * Sets up the input system, creates the player GameObject, and starts the game loop.
      * @returns The created Scene instance
      */
-    createScene(): Scene {
+    public createScene(): Scene {
         this.scene = new Scene(this.engine);
 
         // initialize input system
@@ -112,7 +126,7 @@ export class SceneManager {
      * Sets up the player with a visual component (box mesh) and basic positioning.
      * @returns The configured player GameObject
      */
-    createPlayer(): GameObject {
+    public createPlayer(): GameObject {
         const player = new GameObject("Player", this.scene);
 
         // attach visual

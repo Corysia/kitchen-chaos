@@ -1,6 +1,8 @@
-import { Engine, AbstractMesh, Scene } from "@babylonjs/core";
+import { Engine, Scene } from "@babylonjs/core";
+import { Logger as BabylonLoggerClass } from "@babylonjs/core/Misc/logger";
 import "@babylonjs/inspector";
 import { SceneManager } from "./framework/SceneManager";
+import { Logger, LogLevel, LogTimestampFormat } from "./framework/logger/Logger";
 
 /**
  * Main class for the Kitchen Chaos Babylon.js game
@@ -16,6 +18,17 @@ class Main {
      * Sets up event listeners and starts render loop
      */
     public initialize(): void {
+        Logger.setTimestampFormat(LogTimestampFormat.ISO);
+        Logger.setLogLevel(LogLevel.DEBUG);
+        
+        // Set BabylonJS logger to DEBUG level equivalent
+        // In production, only show errors and warnings from BabylonJS
+        if (import.meta.env.PROD) {
+            BabylonLoggerClass.LogLevels = 1; // ERROR level only
+        } else {
+            BabylonLoggerClass.LogLevels = 3; // DEBUG level in development
+        }
+        
         this.canvas = document.createElement("canvas");
         this.canvas.style.width = '100%';
         this.canvas.style.height = '100%';
@@ -23,7 +36,7 @@ class Main {
         this.engine = new Engine(this.canvas, true);
         
         // Initialize SceneManager
-        this.sceneManager = new SceneManager(this.engine);
+        this.sceneManager = SceneManager.initialize(this.engine);
         const scene = this.sceneManager.createScene();
         
         this.onSceneCreated(scene);
@@ -31,12 +44,11 @@ class Main {
 
     /**
      * Called when scene is successfully created
-     * Sets up event listeners, logs scene objects, and starts rendering
+     * Sets up event listeners, and starts rendering
      * @param scene The created Babylon.js scene
      */
     private onSceneCreated(scene: Scene): void {
         this.setupEventListeners();
-        this.listSceneObjects();
 
         this.engine.runRenderLoop(() => {
             scene.render();
@@ -66,59 +78,6 @@ class Main {
                 }
             }
         });
-    }
-
-    public listSceneObjects(): void {
-        // Get the current scene from SceneManager
-        if (!this.sceneManager.scene) {
-            console.log("No scene available");
-            return;
-        }
-
-        console.log("=== Scene Objects ===");
-        
-        // List all meshes
-        console.log("\n--- Meshes ---");
-        this.sceneManager.scene.meshes.forEach((mesh: AbstractMesh, index: number) => {
-            console.log(`${index + 1}. ${mesh.name} (ID: ${mesh.id})`);
-            console.log(`   Position: ${mesh.position.toString()}`);
-            console.log(`   Visible: ${mesh.isVisible}`);
-        });
-
-        // List all lights
-        console.log("\n--- Lights ---");
-        this.sceneManager.scene.lights.forEach((light: any, index: number) => {
-            console.log(`${index + 1}. ${light.name} (ID: ${light.id})`);
-            console.log(`   Type: ${light.getClassName()}`);
-            if (light.position) {
-                console.log(`   Position: ${light.position.toString()}`);
-            }
-        });
-
-        // List all cameras
-        console.log("\n--- Cameras ---");
-        this.sceneManager.scene.cameras.forEach((camera: any, index: number) => {
-            console.log(`${index + 1}. ${camera.name} (ID: ${camera.id})`);
-            console.log(`   Type: ${camera.getClassName()}`);
-            if (camera.position) {
-                console.log(`   Position: ${camera.position.toString()}`);
-            }
-        });
-
-        // List all transform nodes
-        console.log("\n--- Transform Nodes ---");
-        this.sceneManager.scene.transformNodes.forEach((node: any, index: number) => {
-            console.log(`${index + 1}. ${node.name} (ID: ${node.id})`);
-            if (node.position) {
-                console.log(`   Position: ${node.position.toString()}`);
-            }
-        });
-
-        console.log("\n=== Summary ===");
-        console.log(`Total Meshes: ${this.sceneManager.scene.meshes.length}`);
-        console.log(`Total Lights: ${this.sceneManager.scene.lights.length}`);
-        console.log(`Total Cameras: ${this.sceneManager.scene.cameras.length}`);
-        console.log(`Total Transform Nodes: ${this.sceneManager.scene.transformNodes.length}`);
     }
 }
 

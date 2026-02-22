@@ -23,8 +23,11 @@
 
 # CODER
 
-- Writes code based on Architect’s plan.
+- Writes code based on Architect's plan.
 - No architecture redesign.
+- Always use explicit access modifiers (public, private, protected) for class members.
+- All methods must have JSDoc documentation.
+- When updating methods, review and update JSDoc as necessary.
 
 # REVIEWER
 

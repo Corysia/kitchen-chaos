@@ -12,7 +12,7 @@ import { Lifecycle } from "../interfaces/Lifecycle";
  */
 export abstract class Component implements Lifecycle {
   /** The GameObject this component is attached to. Must be set for component to function. */
-  gameObject!: GameObject;
+  public gameObject!: GameObject;
 
   /**
    * Called when the component is initialized.

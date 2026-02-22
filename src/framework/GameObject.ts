@@ -13,26 +13,26 @@ import { Component } from "./components/Component";
  */
 export class GameObject {
   /** The name/identifier for this GameObject */
-  name: string;
+  public name: string;
   
   /** The Babylon.js TransformNode that handles position, rotation, and scale */
-  transform: TransformNode;
+  public transform: TransformNode;
   
   /** Array of components attached to this GameObject */
-  components: Component[] = [];
+  public components: Component[] = [];
   
   /** Array of child GameObjects in the hierarchy */
-  children: GameObject[] = [];
+  public children: GameObject[] = [];
   
   /** Reference to the parent GameObject, if this is a child */
-  parent?: GameObject;
+  public parent?: GameObject;
 
   /**
    * Creates a new GameObject instance
    * @param name The identifier for this GameObject
    * @param scene The Babylon.js scene to create the transform in
    */
-  constructor(name: string, scene: Scene) {
+  public constructor(name: string, scene: Scene) {
     this.name = name;
     this.transform = new TransformNode(name + "_transform", scene);
   }
@@ -42,7 +42,7 @@ export class GameObject {
    * @param comp The component to add
    * @returns The added component
    */
-  addComponent<T extends Component>(comp: T): T {
+  public addComponent<T extends Component>(comp: T): T {
     comp.gameObject = this;
     this.components.push(comp);
     return comp;
@@ -53,7 +53,7 @@ export class GameObject {
    * Automatically removes the child from its previous parent if it has one
    * @param child The child GameObject to add
    */
-  addChild(child: GameObject): void {
+  public addChild(child: GameObject): void {
     if (child.parent) {
       child.parent.children = child.parent.children.filter(c => c !== child);
     }
@@ -66,7 +66,7 @@ export class GameObject {
    * Removes a child GameObject from this GameObject's hierarchy
    * @param child The child GameObject to remove
    */
-  removeChild(child: GameObject): void {
+  public removeChild(child: GameObject): void {
     this.children = this.children.filter(c => c !== child);
     child.parent = undefined;
     child.transform.parent = null;
@@ -78,7 +78,7 @@ export class GameObject {
    * Dispatches awake call to all components and children
    * Called when the GameObject is first initialized
    */
-  awake() { 
+  public awake() { 
     this.components.forEach(c => c.awake?.());
     this.children.forEach(child => child.awake());
   }
@@ -87,7 +87,7 @@ export class GameObject {
    * Dispatches start call to all components and children
    * Called once before the first frame update
    */
-  start() { 
+  public start() { 
     this.components.forEach(c => c.start?.());
     this.children.forEach(child => child.start());
   }
@@ -97,7 +97,7 @@ export class GameObject {
    * Called every frame before the main update
    * @param dt Delta time in seconds since the last frame
    */
-  earlyUpdate(dt: number) { 
+  public earlyUpdate(dt: number) { 
     this.components.forEach(c => c.earlyUpdate?.(dt));
     this.children.forEach(child => child.earlyUpdate(dt));
   }
@@ -107,7 +107,7 @@ export class GameObject {
    * Called every frame for main game logic
    * @param dt Delta time in seconds since the last frame
    */
-  update(dt: number) { 
+  public update(dt: number) { 
     this.components.forEach(c => c.update?.(dt));
     this.children.forEach(child => child.update(dt));
   }
@@ -117,7 +117,7 @@ export class GameObject {
    * Called every frame after the main update
    * @param dt Delta time in seconds since the last frame
    */
-  lateUpdate(dt: number) { 
+  public lateUpdate(dt: number) { 
     this.components.forEach(c => c.lateUpdate?.(dt));
     this.children.forEach(child => child.lateUpdate(dt));
   }
@@ -126,7 +126,7 @@ export class GameObject {
    * Dispatches destroy call to all components and children
    * Called when the GameObject is being removed from the scene
    */
-  destroy() {
+  public destroy() {
     this.components.forEach(c => c.destroy?.());
     this.children.forEach(child => child.destroy());
     this.transform.dispose();
