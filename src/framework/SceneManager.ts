@@ -1,6 +1,7 @@
 import { Engine, MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight } from "@babylonjs/core";
 import { GameObject } from "./GameObject";
 import { VisualComponent } from "./components/VisualComponent";
+import { CharacterMovementComponent } from "./components/CharacterMovement";
 import { InputSystem } from "./input/InputSystem";
 
 /**
@@ -120,6 +121,9 @@ export class SceneManager {
             mesh.position.y = 1;
             return mesh;
         }));
+
+        // attach movement
+        player.addComponent(new CharacterMovementComponent());
 
         return player;
     }
