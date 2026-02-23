@@ -615,24 +615,24 @@ sequenceDiagram
 
 ## Project Structure
 
-```
+```txt
 src/
-├── main.ts                     # Application entry point
-├── vite-env.d.ts              # Vite environment types
-└── framework/                 # Core framework
-    ├── GameObject.ts          # Base GameObject class
-    ├── SceneManager.ts       # Singleton scene manager
-    ├── components/           # Component system
-    │   ├── Component.ts      # Base component class
-    │   ├── VisualComponent.ts # Visual/mesh component
+├── main.ts                      # Application entry point
+├── vite-env.d.ts                # Vite environment types
+└── framework/                   # Core framework
+    ├── GameObject.ts            # Base GameObject class
+    ├── SceneManager.ts          # Singleton scene manager
+    ├── components/              # Component system
+    │   ├── Component.ts         # Base component class
+    │   ├── VisualComponent.ts   # Visual/mesh component
     │   └── CharacterMovement.ts # Movement component
-    ├── input/                # Input system
-    │   ├── InputAction.ts    # Input action enum
-    │   └── InputSystem.ts    # Input handling system
-    ├── interfaces/           # Framework interfaces
-    │   └── Lifecycle.ts      # Lifecycle interface
-    └── logger/               # Logging utility
-        └── Logger.ts         # Logging system
+    ├── input/                   # Input system
+    │   ├── InputAction.ts       # Input action enum
+    │   └── InputSystem.ts       # Input handling system
+    ├── interfaces/              # Framework interfaces
+    │   └── Lifecycle.ts         # Lifecycle interface
+    └── logger/                  # Logging utility
+        └── Logger.ts            # Logging system
 ```
 
 ## Key Design Patterns

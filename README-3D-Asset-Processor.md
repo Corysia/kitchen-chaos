@@ -25,7 +25,7 @@ This script (`3d-asset-processor.sh`) is a combination of the original `fbx-to-g
 2. **gltf-transform** - For GLB optimization
 
    ```bash
-   npm install -g gltf-transform
+   npm install -g gltf-transform/cli@latest
    ```
 
 ### Installation
