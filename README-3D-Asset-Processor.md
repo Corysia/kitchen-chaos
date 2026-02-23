@@ -33,7 +33,7 @@ This script (`3d-asset-processor.sh`) is a combination of the original `fbx-to-g
 Install both dependencies globally using npm:
 
 ```bash
-npm install -g fbx2gltf gltf-transform
+npm install -g fbx2gltf gltf-transform/cli@latest
 ```
 
 ## Usage
@@ -52,6 +52,7 @@ npm install -g fbx2gltf gltf-transform
 
 | Option | Description |
 |--------|-------------|
+
 | `-c, --convert` | Only convert FBX files to GLB |
 | `-o, --optimize` | Only optimize existing GLB files |
 | `-a, --all` | Perform both conversion and optimization (default) |
@@ -140,7 +141,7 @@ The test suite will:
 
 ### Success Output
 
-```
+```txt
 [INFO] 3D Asset Processor starting in: /path/to/project
 [SUCCESS] All required dependencies are available.
 [INFO] Starting FBX to GLB conversion...
@@ -165,7 +166,7 @@ The test suite will:
 
 ### Error Output (Missing Dependencies)
 
-```
+```txt
 [INFO] 3D Asset Processor starting in: /path/to/project
 [ERROR] Missing required dependencies:
   - fbx2gltf: Install with 'npm install -g fbx2gltf'

@@ -14,8 +14,8 @@ import { InputSystem } from "./input/InputSystem";
  * - Input system initialization
  * - Game loop execution with proper timing
  */
-export class SceneManager {
-    private static _instance: SceneManager | null = null;
+export class StageManager {
+    private static _instance: StageManager | null = null;
 
     /** The Babylon.js engine instance */
     public engine: Engine;
@@ -33,41 +33,41 @@ export class SceneManager {
     public inputSystem!: InputSystem;
 
     /**
-     * Creates a new SceneManager instance (singleton pattern)
+     * Creates a new StageManager instance (singleton pattern)
      * @param engine The Babylon.js engine to use
      * @throws Error if an instance already exists
      */
     private constructor(engine: Engine) {
-        if (SceneManager._instance) {
-            throw new Error("SceneManager instance already exists");
+        if (StageManager._instance) {
+            throw new Error("StageManager instance already exists");
         }
-        SceneManager._instance = this;
+        StageManager._instance = this;
         this.engine = engine;
     }
 
     /**
-     * Gets the singleton SceneManager instance
-     * @returns The SceneManager instance
-     * @throws Error if SceneManager has not been initialized
+     * Gets the singleton StageManager instance
+     * @returns The StageManager instance
+     * @throws Error if StageManager has not been initialized
      */
-    public static get instance(): SceneManager {
-        if (!SceneManager._instance) {
-            throw new Error("SceneManager has not been initialized");
+    public static get instance(): StageManager {
+        if (!StageManager._instance) {
+            throw new Error("StageManager has not been initialized");
         }
-        return SceneManager._instance;
+        return StageManager._instance;
     }
 
     /**
-     * Initializes the singleton SceneManager instance
+     * Initializes the singleton StageManager instance
      * @param engine The Babylon.js engine to use
-     * @returns The initialized SceneManager instance
+     * @returns The initialized StageManager instance
      * @throws Error if an instance already exists
      */
-    public static initialize(engine: Engine): SceneManager {
-        if (SceneManager._instance) {
-            throw new Error("SceneManager instance already exists");
+    public static initialize(engine: Engine): StageManager {
+        if (StageManager._instance) {
+            throw new Error("StageManager instance already exists");
         }
-        const instance = new SceneManager(engine);
+        const instance = new StageManager(engine);
         return instance;
     }
 

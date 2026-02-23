@@ -1,20 +1,20 @@
 import { Engine, Scene } from "@babylonjs/core";
 import { Logger as BabylonLoggerClass } from "@babylonjs/core/Misc/logger";
 import "@babylonjs/inspector";
-import { SceneManager } from "./framework/SceneManager";
+import { StageManager } from "./framework/StageManager";
 import { Logger, LogLevel, LogTimestampFormat } from "./framework/logger/Logger";
 
 /**
  * Main class for the Kitchen Chaos Babylon.js game
- * Handles canvas creation, engine initialization, and SceneManager setup
+ * Handles canvas creation, engine initialization, and StageManager setup
  */
 class Main {
     private engine!: Engine;
     private canvas!: HTMLCanvasElement;
-    private sceneManager!: SceneManager;
+    private stageManager!: StageManager;
 
     /**
-     * Initializes game by creating canvas, engine, and SceneManager
+     * Initializes game by creating canvas, engine, and StageManager
      * Sets up event listeners and starts render loop
      */
     public initialize(): void {
@@ -35,9 +35,9 @@ class Main {
         document.body.appendChild(this.canvas);
         this.engine = new Engine(this.canvas, true);
         
-        // Initialize SceneManager
-        this.sceneManager = SceneManager.initialize(this.engine);
-        const scene = this.sceneManager.createScene();
+        // Initialize StageManager
+        this.stageManager = StageManager.initialize(this.engine);
+        const scene = this.stageManager.createScene();
         
         this.onSceneCreated(scene);
     }
@@ -71,10 +71,10 @@ class Main {
             }
             // Shift+Ctrl+Alt+I
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === "KeyI") {
-                if (this.sceneManager.scene.debugLayer.isVisible()) {
-                    this.sceneManager.scene.debugLayer.hide();
+                if (this.stageManager.scene.debugLayer.isVisible()) {
+                    this.stageManager.scene.debugLayer.hide();
                 } else {
-                    this.sceneManager.scene.debugLayer.show();
+                    this.stageManager.scene.debugLayer.show();
                 }
             }
         });

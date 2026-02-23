@@ -1,6 +1,6 @@
 import { InputSystem } from "../input/InputSystem";
 import { Component } from "./Component";
-import { SceneManager } from "../SceneManager";
+import { StageManager } from "../StageManager";
 import { InputAction } from "../input/InputAction";
 
 export class CharacterMovementComponent extends Component {
@@ -9,7 +9,7 @@ export class CharacterMovementComponent extends Component {
 
   awake() {
     // get the InputSystem from somewhere (SceneManager, DI, or global)
-    this.input = SceneManager.instance.inputSystem;
+    this.input = StageManager.instance.inputSystem;
 
     this.input.on(InputAction.MoveForward, active => this.forward = active);
     this.input.on(InputAction.MoveBackward, active => this.backward = active);

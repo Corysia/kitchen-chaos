@@ -7,7 +7,7 @@
     - [Core Framework Classes](#core-framework-classes)
       - [`Main`](#main)
       - [`Logger`](#logger)
-      - [`SceneManager`](#scenemanager)
+      - [`StageManager`](#stagemanager)
       - [`GameObject`](#gameobject)
     - [Component System](#component-system)
       - [`Component`](#component)
@@ -61,7 +61,7 @@ The main application class that initializes and starts the game.
 
 **Methods**:
 
-- `initialize()`: Initializes logging, creates canvas and engine, sets up SceneManager
+- `initialize()`: Initializes logging, creates canvas and engine, sets up StageManager
 - `private onSceneCreated(scene)`: Sets up event listeners and starts render loop
 - `private setupEventListeners()`: Adds keyboard shortcuts for fullscreen and debug layer
 
@@ -70,7 +70,7 @@ The main application class that initializes and starts the game.
 - Configures logging levels and timestamp formats
 - Handles keyboard shortcuts (Shift+Ctrl+Alt+F for fullscreen, Shift+Ctrl+Alt+I for inspector)
 - Creates HTML canvas and BabylonJS engine
-- Initializes SceneManager and creates the game scene
+- Initializes StageManager and creates the game scene
 
 ---
 
@@ -109,7 +109,7 @@ A static utility class for logging with configurable levels and timestamp format
 
 ---
 
-#### `SceneManager`
+#### `StageManager`
 
 **Location**: `src/framework/SceneManager.ts`
 
@@ -130,7 +130,7 @@ A singleton class that manages BabylonJS engine, scene, GameObjects, and the mai
 **Static Methods**:
 
 - `get instance()`: Gets the singleton instance
-- `initialize(engine)`: Initializes the singleton SceneManager
+- `initialize(engine)`: Initializes the singleton StageManager
 
 **Instance Methods**:
 
@@ -338,22 +338,22 @@ classDiagram
     class Main {
         -engine: Engine
         -canvas: HTMLCanvasElement
-        -sceneManager: SceneManager
+        -stageManager: StageManager
         +initialize() void
         -onSceneCreated(scene) void
         -setupEventListeners() void
     }
     
     %% Framework Core
-    class SceneManager {
-        -static _instance: SceneManager
+    class StageManager {
+        -static _instance: StageManager
         -engine: Engine
         -scene: Scene
         -gameObjects: Array~GameObject~
         -started: boolean
         -inputSystem: InputSystem
-        +static instance: SceneManager
-        +static initialize(engine) SceneManager
+        +static instance: StageManager
+        +static initialize(engine) StageManager
         +createScene() Scene
         +createPlayer() GameObject
     }
@@ -469,10 +469,10 @@ classDiagram
     }
     
     %% Relationships
-    Main --> SceneManager : creates
+    Main --> StageManager : creates
     Main --> Logger : configures
-    SceneManager --> GameObject : manages
-    SceneManager --> InputSystem : creates
+    StageManager --> GameObject : manages
+    StageManager --> InputSystem : creates
     GameObject --> Component : has
     GameObject --> GameObject : parent-child
     VisualComponent --|> Component : extends
@@ -490,7 +490,7 @@ classDiagram
 sequenceDiagram
     participant Main
     participant Logger
-    participant SceneManager
+    participant StageManager
     participant Engine
     participant Scene
     participant InputSystem
@@ -499,28 +499,28 @@ sequenceDiagram
     Main->>Logger: Set log level and timestamp format
     Main->>Main: createCanvas()
     Main->>Engine: new Engine(canvas)
-    Main->>SceneManager: initialize(engine)
+    Main->>StageManager: initialize(engine)
     
-    SceneManager->>SceneManager: createScene()
-    SceneManager->>Scene: new Scene(engine)
-    SceneManager->>InputSystem: new InputSystem(scene)
+    StageManager->>StageManager: createScene()
+    StageManager->>Scene: new Scene(engine)
+    StageManager->>InputSystem: new InputSystem(scene)
     
-    SceneManager->>Scene: create camera
-    SceneManager->>Scene: create light
-    SceneManager->>Scene: create ground
+    StageManager->>Scene: create camera
+    StageManager->>Scene: create light
+    StageManager->>Scene: create ground
     
-    SceneManager->>SceneManager: createPlayer()
-    SceneManager->>GameObject: new GameObject("Player", scene)
+    StageManager->>StageManager: createPlayer()
+    StageManager->>GameObject: new GameObject("Player", scene)
     GameObject->>GameObject: addComponent(VisualComponent)
     GameObject->>GameObject: addComponent(CharacterMovementComponent)
-    SceneManager->>SceneManager: gameObjects.push(player)
+    StageManager->>StageManager: gameObjects.push(player)
     
-    SceneManager->>GameObject: awake()
+    StageManager->>GameObject: awake()
     GameObject->>Component: awake()
     
-    Note over SceneManager,Scene: Setup render observers
-    SceneManager->>Scene: onBeforeRenderObservable.add(awake/start)
-    SceneManager->>Scene: onBeforeRenderObservable.add(update loop)
+    Note over StageManager,Scene: Setup render observers
+    StageManager->>Scene: onBeforeRenderObservable.add(awake/start)
+    StageManager->>Scene: onBeforeRenderObservable.add(update loop)
     
     Main->>Engine: runRenderLoop()
     Engine->>Engine: render() every frame
@@ -530,40 +530,40 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant SceneManager
+    participant StageManager
     participant GameObject
     participant Component
     participant Scene
     
-    Note over SceneManager,Scene: GameObject Creation
-    SceneManager->>GameObject: new GameObject(name, scene)
+    Note over StageManager,Scene: GameObject Creation
+    StageManager->>GameObject: new GameObject(name, scene)
     GameObject->>Scene: new TransformNode(name, scene)
     GameObject->>GameObject: addComponent(component)
     Component->>Component: gameObject = this GameObject
     
-    Note over SceneManager,Scene: Initialization Phase
-    SceneManager->>GameObject: awake()
+    Note over StageManager,Scene: Initialization Phase
+    StageManager->>GameObject: awake()
     GameObject->>Component: awake()
     GameObject->>GameObject: children.forEach(awake)
     
-    Note over SceneManager,Scene: Start Phase (first frame)
-    Scene->>SceneManager: onBeforeRender (first time)
-    SceneManager->>GameObject: start()
+    Note over StageManager,Scene: Start Phase (first frame)
+    Scene->>StageManager: onBeforeRender (first time)
+    StageManager->>GameObject: start()
     GameObject->>Component: start()
     GameObject->>GameObject: children.forEach(start)
     
-    Note over SceneManager,Scene: Game Loop (Every Frame)
+    Note over StageManager,Scene: Game Loop (Every Frame)
     loop Each Frame
-        Scene->>SceneManager: onBeforeRender
-        SceneManager->>GameObject: earlyUpdate(dt)
+        Scene->>StageManager: onBeforeRender
+        StageManager->>GameObject: earlyUpdate(dt)
         GameObject->>Component: earlyUpdate(dt)
         GameObject->>GameObject: children.forEach(earlyUpdate)
         
-        SceneManager->>GameObject: update(dt)
+        StageManager->>GameObject: update(dt)
         GameObject->>Component: update(dt)
         GameObject->>GameObject: children.forEach(update)
         
-        SceneManager->>GameObject: lateUpdate(dt)
+        StageManager->>GameObject: lateUpdate(dt)
         GameObject->>Component: lateUpdate(dt)
         GameObject->>GameObject: children.forEach(lateUpdate)
         
@@ -571,7 +571,7 @@ sequenceDiagram
         Scene->>Scene: render()
     end
     
-    Note over SceneManager,Scene: GameObject Destruction
+    Note over StageManager,Scene: GameObject Destruction
     GameObject->>Component: destroy()
     GameObject->>GameObject: children.forEach(destroy)
     GameObject->>GameObject: transform.dispose()
@@ -621,7 +621,7 @@ src/
 ├── vite-env.d.ts                # Vite environment types
 └── framework/                   # Core framework
     ├── GameObject.ts            # Base GameObject class
-    ├── SceneManager.ts          # Singleton scene manager
+    ├── StageManager.ts          # Singleton stage manager
     ├── components/              # Component system
     │   ├── Component.ts         # Base component class
     │   ├── VisualComponent.ts   # Visual/mesh component
@@ -639,7 +639,7 @@ src/
 
 ### Singleton Pattern
 
-- `SceneManager` and `Logger` use singleton pattern for global access
+- `StageManager` and `Logger` use singleton pattern for global access
 - Ensures single instance and provides global point of access
 
 ### GameObject-Component System
@@ -670,7 +670,7 @@ src/
 ## Development Notes
 
 1. **Logging**: Configure log levels in `Main.initialize()` for debugging
-2. **Scene Management**: Use `SceneManager` for all scene and GameObject operations
+2. **Scene Management**: Use `StageManager` for all scene and GameObject operations
 3. **GameObject System**: Extend `GameObject` for game objects, use composition with components
 4. **Components**: Create components by extending `Component` class, attach to GameObjects
 5. **Input**: Use `InputSystem` for action-based input handling with configurable bindings
