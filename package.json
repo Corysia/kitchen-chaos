@@ -5,13 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "host": "vite --host",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "nuke": "rm -rf dist node_modules package-lock.json && npm cache clean --force",
+    "clean": "rm -rf dist node_modules package-lock.json && npm install",
+    "test": "vitest"
   },
   "devDependencies": {
     "@babylonjs/core": "^8.52.0",
     "@babylonjs/inspector": "^8.52.0",
     "typescript": "~5.7.2",
-    "vite": "^6.3.1"
+    "vite": "^6.3.1",
+    "vitest": "^4.0.18"
   }
 }

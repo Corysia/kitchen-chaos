@@ -1,4 +1,4 @@
-import { Engine, MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight } from "@babylonjs/core";
+import { Engine, MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh } from "@babylonjs/core";
 import { GameObject } from "./GameObject";
 import { VisualComponent } from "./components/VisualComponent";
 import { CharacterMovementComponent } from "./components/CharacterMovement";
@@ -83,16 +83,25 @@ export class StageManager {
         this.inputSystem = new InputSystem(this.scene);
 
         // create camera
-        const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), this.scene);
+        const camera = new FreeCamera("camera1", new Vector3(0, 10, -10), this.scene);
+
+        // This targets the camera to scene origin
         camera.setTarget(Vector3.Zero());
-        camera.attachControl(this.engine.getRenderingCanvas(), true);
 
-        // create light
-        const light = new HemisphericLight("light1", new Vector3(0, 1, 0), this.scene);
-        light.intensity = 0.7;
+        // camera.attachControl(this.engine.getRenderingCanvas(), true);
 
-        // create ground
-        MeshBuilder.CreateGround("ground", {width: 6, height: 6}, this.scene);
+        // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
+        const hemlight = new HemisphericLight("light1", new Vector3(0, 1, 0), this.scene);
+
+        // Default intensity is 1. Let's dim the light a small amount
+        hemlight.intensity = 0.7;
+
+        // light1
+        const light = new DirectionalLight("dir01", new Vector3(50, -30, 0), this.scene);
+        light.position = new Vector3(0, 180, -20);
+        light.intensity = 0.5;
+
+        this.createGround(50, 50, './textures/ButtonBackground.png', 50, 50);
 
         // create player
         const player = this.createPlayer();
@@ -140,5 +149,45 @@ export class StageManager {
         player.addComponent(new CharacterMovementComponent());
 
         return player;
+    }
+
+        /**
+     * Creates and returns a standard material with a diffuse texture for the ground.
+     * The texture is scaled to repeat tileX times along the U axis and tileY times along the V axis.
+     *
+     * @param {string} textureUrl The URL of the diffuse texture.
+     * @param {number} tileX The number of times to repeat the texture along the U axis.
+     * @param {number} tileY The number of times to repeat the texture along the V axis.
+     *
+     * @returns {StandardMaterial} The created ground material with the applied texture.
+     */
+    private createGroundMaterial(textureUrl: string, tileX: number, tileY: number): StandardMaterial {
+        const groundTexture = new Texture(textureUrl, this.scene);
+        groundTexture.uScale = tileX;
+        groundTexture.vScale = tileY;
+
+        const groundMaterial = new StandardMaterial("groundMaterial", this.scene);
+        groundMaterial.diffuseTexture = groundTexture;
+        return groundMaterial;
+    }
+
+    /**
+     * Creates and returns a ground mesh with a standard material that has a diffuse texture.
+     * The ground mesh is created with MeshBuilder.CreateGround() and the texture is scaled to repeat tileX times along the U axis and tileY times along the V axis.
+     *
+     * @param {number} width The width of the ground mesh.
+     * @param {number} height The height of the ground mesh.
+     * @param {string} textureUrl The URL of the diffuse texture.
+     * @param {number} tileX The number of times to repeat the texture along the U axis.
+     * @param {number} tileY The number of times to repeat the texture along the V axis.
+     *
+     * @returns {GroundMesh} The created ground mesh.
+     */
+    private createGround(width: number, height: number, textureUrl: string, tileX: number, tileY: number): GroundMesh {
+        const ground = MeshBuilder.CreateGround("ground", { width: width, height: height }, this.scene);
+        ground.position = Vector3.Zero();
+        ground.material = this.createGroundMaterial(textureUrl, tileX, tileY);
+        ground.receiveShadows = true;
+        return ground;
     }
 }
