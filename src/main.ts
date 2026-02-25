@@ -17,7 +17,7 @@ class Main {
      * Initializes game by creating canvas, engine, and StageManager
      * Sets up event listeners and starts render loop
      */
-    public initialize(): void {
+    public async initialize(): Promise<void> {
         Logger.setTimestampFormat(LogTimestampFormat.ISO);
         Logger.setLogLevel(LogLevel.DEBUG);
         
@@ -37,7 +37,7 @@ class Main {
         
         // Initialize StageManager
         this.stageManager = StageManager.initialize(this.engine);
-        const scene = this.stageManager.createScene();
+        const scene = await this.stageManager.createScene();
         
         this.onSceneCreated(scene);
     }
@@ -70,13 +70,16 @@ class Main {
                 this.engine.switchFullscreen(false);
             }
             // Shift+Ctrl+Alt+I
-            if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === "KeyI") {
-                if (this.stageManager.scene.debugLayer.isVisible()) {
-                    this.stageManager.scene.debugLayer.hide();
-                } else {
-                    this.stageManager.scene.debugLayer.show();
+            // TODO: renable later
+            // if (!import.meta.env.PROD) {
+                if (!import.meta.env.PROD && ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === "KeyI") {
+                    if (this.stageManager.scene.debugLayer.isVisible()) {
+                        this.stageManager.scene.debugLayer.hide();
+                    } else {
+                        this.stageManager.scene.debugLayer.show();
+                    }
                 }
-            }
+            // } 
         });
     }
 }

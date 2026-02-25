@@ -1,8 +1,10 @@
-import { Engine, MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh } from "@babylonjs/core";
+import { Engine, MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync } from "@babylonjs/core";
 import { GameObject } from "./GameObject";
 import { VisualComponent } from "./components/VisualComponent";
 import { CharacterMovementComponent } from "./components/CharacterMovement";
 import { InputSystem } from "./input/InputSystem";
+import { Logger } from "./logger/Logger";
+import { registerBuiltInLoaders } from "@babylonjs/loaders/dynamic";
 
 /**
  * Singleton manager for the game scene and GameObject lifecycle.
@@ -32,6 +34,8 @@ export class StageManager {
     /** Global input system for handling user input */
     public inputSystem!: InputSystem;
 
+    private _shadowGenerator: ShadowGenerator | undefined;
+
     /**
      * Creates a new StageManager instance (singleton pattern)
      * @param engine The Babylon.js engine to use
@@ -43,6 +47,7 @@ export class StageManager {
         }
         StageManager._instance = this;
         this.engine = engine;
+        registerBuiltInLoaders();
     }
 
     /**
@@ -76,7 +81,7 @@ export class StageManager {
      * Sets up the input system, creates the player GameObject, and starts the game loop.
      * @returns The created Scene instance
      */
-    public createScene(): Scene {
+    public async createScene(): Promise<Scene> {
         this.scene = new Scene(this.engine);
 
         // initialize input system
@@ -87,8 +92,6 @@ export class StageManager {
 
         // This targets the camera to scene origin
         camera.setTarget(Vector3.Zero());
-
-        // camera.attachControl(this.engine.getRenderingCanvas(), true);
 
         // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
         const hemlight = new HemisphericLight("light1", new Vector3(0, 1, 0), this.scene);
@@ -103,12 +106,50 @@ export class StageManager {
 
         this.createGround(50, 50, './textures/ButtonBackground.png', 50, 50);
 
+        const shadowGenerator = new ShadowGenerator(1024, light);
+        shadowGenerator.useExponentialShadowMap = true;
+
+        this._shadowGenerator = shadowGenerator;
+
         // create player
         const player = this.createPlayer();
         this.gameObjects.push(player);
 
+
+        Logger.debug('Starting to load ClearCounter_Visual.glb');
+        const result = await ImportMeshAsync('./models/ClearCounter_Visual.glb', this.scene);
+        const ClearCounter = result.meshes[0];
+        ClearCounter.position = new Vector3(2, 0, 2);
+        ClearCounter.rotation = Vector3.Zero();
+        ClearCounter.receiveShadows = true;
+        this._shadowGenerator?.addShadowCaster(ClearCounter);
+        Logger.debug("CuttingCounter_Visual.glb loaded successfully");
+
+        Logger.debug('Starting to load CuttingCounter_Visual.glb');
+        const result1 = await ImportMeshAsync('./models/CuttingCounter_Visual.glb', this.scene);
+        const CuttingCounter = result1.meshes[0];
+        CuttingCounter.position = new Vector3(3.5, 0, 2);
+        CuttingCounter.rotation = Vector3.Zero();
+        CuttingCounter.receiveShadows = true;
+        this._shadowGenerator?.addShadowCaster(CuttingCounter);
+        Logger.debug("CuttingCounter_Visual.glb loaded successfully");
+
+        Logger.debug('Starting to load StoveCounter_Visual.glb');
+        const result2 = await ImportMeshAsync('./models/StoveCounter_Visual.glb', this.scene);
+        const StoveCounter = result2.meshes[0];
+        StoveCounter.position = new Vector3(5, 0, 2);
+        StoveCounter.rotation = Vector3.Zero();;
+        StoveCounter.receiveShadows = true;
+        this._shadowGenerator?.addShadowCaster(StoveCounter);
+        Logger.debug("StoveCounter_Visual.glb loaded successfully");
+
+        this.scene.getMeshByName("StoveOnVisual")?.setEnabled(true);
+        Logger.debug("All actors loaded successfully");
+
+
+
         // call awake on all objects
-        this.gameObjects.forEach(go => go.awake());
+        await Promise.all(this.gameObjects.map(go => go.awake()));
 
         // start after first render
         this.scene.onBeforeRenderObservable.add(() => {
@@ -139,10 +180,16 @@ export class StageManager {
         const player = new GameObject("Player", this.scene);
 
         // attach visual
-        player.addComponent(new VisualComponent(scene => {
-            const mesh = MeshBuilder.CreateBox("PlayerVisual", {}, scene);
-            mesh.position.y = 1;
-            return mesh;
+        player.addComponent(new VisualComponent(async (scene) => {
+            Logger.debug('Starting to load PlayerVisual.glb');
+            let result = await ImportMeshAsync('./models/PlayerVisual.glb', scene);
+            const PlayerVisual = result.meshes[0];
+            PlayerVisual.position = Vector3.Zero();;
+            PlayerVisual.rotation = Vector3.Zero();;
+            PlayerVisual.receiveShadows = true;
+            this._shadowGenerator?.addShadowCaster(PlayerVisual);
+            Logger.debug("PlayerVisual.glb loaded successfully");
+            return PlayerVisual;
         }));
 
         // attach movement

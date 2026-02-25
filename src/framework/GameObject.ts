@@ -78,9 +78,15 @@ export class GameObject {
    * Dispatches awake call to all components and children
    * Called when the GameObject is first initialized
    */
-  public awake() { 
-    this.components.forEach(c => c.awake?.());
-    this.children.forEach(child => child.awake());
+  public async awake() { 
+    const componentPromises = this.components
+      .map(c => c.awake?.())
+      .filter((promise): promise is Promise<void> => promise !== undefined);
+    
+    const childPromises = this.children
+      .map(child => child.awake());
+    
+    await Promise.all([...componentPromises, ...childPromises]);
   }
   
   /**

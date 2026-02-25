@@ -4,13 +4,13 @@ import { Component } from "./Component";
 export class VisualComponent extends Component {
   mesh!: AbstractMesh;
 
-  constructor(private readonly meshFactory: (scene: Scene) => AbstractMesh) {
+  constructor(private readonly meshFactory: (scene: Scene) => Promise<AbstractMesh>) {
     super();
   }
 
-  awake() {
+  async awake() {
     const scene = this.gameObject.transform.getScene();
-    this.mesh = this.meshFactory(scene);
+    this.mesh = await this.meshFactory(scene);
 
     // parent mesh to the transform
     this.mesh.parent = this.gameObject.transform;
