@@ -1,4 +1,4 @@
-import { Engine, MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync } from "@babylonjs/core";
+import { Engine, MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3 } from "@babylonjs/core";
 import { GameObject } from "./GameObject";
 import { VisualComponent } from "./components/VisualComponent";
 import { CharacterMovementComponent } from "./components/CharacterMovement";
@@ -188,6 +188,21 @@ export class StageManager {
             PlayerVisual.rotation = Vector3.Zero();;
             PlayerVisual.receiveShadows = true;
             this._shadowGenerator?.addShadowCaster(PlayerVisual);
+            
+            // Find Eye_R mesh and set its material to black
+            const eyeRM = scene.getMeshByName("Eye_R");
+            if (eyeRM) {
+                const blackMaterial = new StandardMaterial("EyeR_Black_Material", scene);
+                blackMaterial.diffuseColor = new Color3(0, 0, 0); // Black color
+                blackMaterial.specularColor = new Color3(1, 1, 1); // White specular for shine
+                blackMaterial.specularPower = 128; // High specular power for sharp shine
+                blackMaterial.ambientColor = new Color3(0.1, 0.1, 0.1); // Slight ambient reflection
+                eyeRM.material = blackMaterial;
+                Logger.debug("Eye_R material set to black");
+            } else {
+                Logger.warn("Eye_R mesh not found in PlayerVisual.glb");
+            }
+            
             Logger.debug("PlayerVisual.glb loaded successfully");
             return PlayerVisual;
         }));

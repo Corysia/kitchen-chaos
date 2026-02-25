@@ -19,15 +19,17 @@ class Main {
      */
     public async initialize(): Promise<void> {
         Logger.setTimestampFormat(LogTimestampFormat.ISO);
-        Logger.setLogLevel(LogLevel.DEBUG);
+        Logger.setLogLevel(LogLevel.TRACE);
         
         // Set BabylonJS logger to DEBUG level equivalent
         // In production, only show errors and warnings from BabylonJS
-        if (import.meta.env.PROD) {
-            BabylonLoggerClass.LogLevels = 1; // ERROR level only
-        } else {
-            BabylonLoggerClass.LogLevels = 3; // DEBUG level in development
-        }
+        // TODO: re-enable this later
+        // if (import.meta.env.PROD) {
+            // BabylonLoggerClass.LogLevels = 1; // ERROR level only
+        // } else {
+            // BabylonLoggerClass.LogLevels = 4; // DEBUG level in development
+            BabylonLoggerClass.LogLevels = 7; // ALL level in development
+        // }
         
         this.canvas = document.createElement("canvas");
         this.canvas.style.width = '100%';
@@ -70,9 +72,9 @@ class Main {
                 this.engine.switchFullscreen(false);
             }
             // Shift+Ctrl+Alt+I
-            // TODO: renable later
+            // TODO: re-enable this later
             // if (!import.meta.env.PROD) {
-                if (!import.meta.env.PROD && ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === "KeyI") {
+                if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === "KeyI") {
                     if (this.stageManager.scene.debugLayer.isVisible()) {
                         this.stageManager.scene.debugLayer.hide();
                     } else {
