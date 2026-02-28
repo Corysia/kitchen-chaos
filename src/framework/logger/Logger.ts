@@ -39,7 +39,7 @@ export enum LogTimestampFormat {
 export class Logger {
 
     private static _instance: Logger;
-    private static readonly production: boolean = import.meta.env.PROD;
+    private static readonly production: boolean = false; // TODO: set to import.meta.env.PROD;
     private static logLevel: LogLevel = LogLevel.ERROR;
     private static timestampFormat: LogTimestampFormat = LogTimestampFormat.ISO;
 

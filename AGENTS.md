@@ -46,6 +46,10 @@
 - No emojis.
 - No over-explanation.
 
+# Critical Safety Rule
+
+- NEVER EVER run git checkout (or equivalent restore/revert) without explicit manual user consent in the current thread.
+
 # OPTIONAL CHARACTER MODES
 
 ## ELMER_FUDD_MODE
