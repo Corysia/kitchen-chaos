@@ -1,20 +1,16 @@
-import { Engine, MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3 } from "@babylonjs/core";
-import { GameObject } from "./GameObject";
-import { VisualComponent } from "./components/VisualComponent";
-import { CharacterMovementComponent } from "./components/CharacterMovement";
-import { InputSystem } from "./input/InputSystem";
-import { Logger } from "./logger/Logger";
-import { registerBuiltInLoaders } from "@babylonjs/loaders/dynamic";
+import { Engine } from "@babylonjs/core";
+import { Stage } from "./Stage";
+import { GameStage } from "../Stages/GameStage";
 
 /**
- * Singleton manager for the game scene and GameObject lifecycle.
- * Coordinates the main game loop, input system, and GameObject management.
+ * Singleton manager for stage lifecycle and coordination.
+ * Manages multiple stages, coordinates the main game loop, and handles stage transitions.
  * 
  * Key responsibilities:
- * - Scene creation and management
- * - GameObject lifecycle coordination
- * - Input system initialization
- * - Game loop execution with proper timing
+ * - Stage creation and management
+ * - Stage lifecycle coordination
+ * - Game loop execution across all active stages
+ * - Stage transitions and resource management
  */
 export class StageManager {
     private static _instance: StageManager | null = null;
@@ -22,19 +18,14 @@ export class StageManager {
     /** The Babylon.js engine instance */
     public engine: Engine;
     
-    /** The main game scene */
-    public scene!: Scene;
+    /** Array of all active stages */
+    public stages: Stage[] = [];
     
-    /** Array of all active GameObjects in the scene */
-    public gameObjects: GameObject[] = [];
+    /** The currently active stage */
+    public activeStage: Stage | null = null;
     
     /** Flag indicating if the game has started */
     public started = false;
-    
-    /** Global input system for handling user input */
-    public inputSystem!: InputSystem;
-
-    private _shadowGenerator: ShadowGenerator | undefined;
 
     /**
      * Creates a new StageManager instance (singleton pattern)
@@ -47,7 +38,6 @@ export class StageManager {
         }
         StageManager._instance = this;
         this.engine = engine;
-        registerBuiltInLoaders();
     }
 
     /**
@@ -77,179 +67,82 @@ export class StageManager {
     }
 
     /**
-     * Creates and initializes the main game scene.
-     * Sets up the input system, creates the player GameObject, and starts the game loop.
-     * @returns The created Scene instance
+     * Adds a stage to the manager.
+     * @param stage The stage to add
      */
-    public async createScene(): Promise<Scene> {
-        this.scene = new Scene(this.engine);
+    public addStage(stage: Stage): void {
+        this.stages.push(stage);
+    }
 
-        // initialize input system
-        this.inputSystem = new InputSystem(this.scene);
+    /**
+     * Removes a stage from the manager and disposes it.
+     * @param stage The stage to remove
+     */
+    public removeStage(stage: Stage): void {
+        const index = this.stages.indexOf(stage);
+        if (index > -1) {
+            this.stages.splice(index, 1);
+            stage.dispose();
+        }
+    }
 
-        // create camera
-        const camera = new FreeCamera("camera1", new Vector3(0, 10, -10), this.scene);
+    /**
+     * Sets the active stage.
+     * @param stage The stage to make active
+     */
+    public setActiveStage(stage: Stage): void {
+        if (this.activeStage) {
+            this.activeStage.started = false;
+        }
+        this.activeStage = stage;
+    }
 
-        // This targets the camera to scene origin
-        camera.setTarget(Vector3.Zero());
-
-        // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-        const hemlight = new HemisphericLight("light1", new Vector3(0, 1, 0), this.scene);
-
-        // Default intensity is 1. Let's dim the light a small amount
-        hemlight.intensity = 0.7;
-
-        // light1
-        const light = new DirectionalLight("dir01", new Vector3(50, -30, 0), this.scene);
-        light.position = new Vector3(0, 180, -20);
-        light.intensity = 0.5;
-
-        this.createGround(50, 50, './textures/ButtonBackground.png', 50, 50);
-
-        const shadowGenerator = new ShadowGenerator(1024, light);
-        shadowGenerator.useExponentialShadowMap = true;
-
-        this._shadowGenerator = shadowGenerator;
-
-        // create player
-        const player = this.createPlayer();
-        this.gameObjects.push(player);
-
-
-        Logger.debug('Starting to load ClearCounter_Visual.glb');
-        const result = await ImportMeshAsync('./models/ClearCounter_Visual.glb', this.scene);
-        const ClearCounter = result.meshes[0];
-        ClearCounter.position = new Vector3(2, 0, 2);
-        ClearCounter.rotation = Vector3.Zero();
-        ClearCounter.receiveShadows = true;
-        this._shadowGenerator?.addShadowCaster(ClearCounter);
-        Logger.debug("CuttingCounter_Visual.glb loaded successfully");
-
-        Logger.debug('Starting to load CuttingCounter_Visual.glb');
-        const result1 = await ImportMeshAsync('./models/CuttingCounter_Visual.glb', this.scene);
-        const CuttingCounter = result1.meshes[0];
-        CuttingCounter.position = new Vector3(3.5, 0, 2);
-        CuttingCounter.rotation = Vector3.Zero();
-        CuttingCounter.receiveShadows = true;
-        this._shadowGenerator?.addShadowCaster(CuttingCounter);
-        Logger.debug("CuttingCounter_Visual.glb loaded successfully");
-
-        Logger.debug('Starting to load StoveCounter_Visual.glb');
-        const result2 = await ImportMeshAsync('./models/StoveCounter_Visual.glb', this.scene);
-        const StoveCounter = result2.meshes[0];
-        StoveCounter.position = new Vector3(5, 0, 2);
-        StoveCounter.rotation = Vector3.Zero();;
-        StoveCounter.receiveShadows = true;
-        this._shadowGenerator?.addShadowCaster(StoveCounter);
-        Logger.debug("StoveCounter_Visual.glb loaded successfully");
-
-        this.scene.getMeshByName("StoveOnVisual")?.setEnabled(true);
-        Logger.debug("All actors loaded successfully");
-
-
-
-        // call awake on all objects
-        await Promise.all(this.gameObjects.map(go => go.awake()));
+    /**
+     * Creates and initializes the main game stage.
+     * Sets up the input system, creates the player GameObject, and starts the game loop.
+     * @returns Promise that resolves when the stage is created and initialized
+     */
+    public async createGameStage(): Promise<Stage> {
+        const gameStage = new GameStage();
+        this.addStage(gameStage);
+        this.setActiveStage(gameStage);
+        await gameStage.initialize(this.engine);
+        gameStage.start(); // Start the stage after initialization
 
         // start after first render
-        this.scene.onBeforeRenderObservable.add(() => {
-            if (!this.started) {
+        gameStage.scene.onBeforeRenderObservable.add(() => {
+            if (!this.started && gameStage.started) {
                 this.started = true;
-                this.gameObjects.forEach(go => go.start());
             }
         });
 
         // update loop
-        this.scene.onBeforeRenderObservable.add(() => {
-            const dt = this.scene.getEngine().getDeltaTime() / 1000;
-
-            this.gameObjects.forEach(go => go.earlyUpdate(dt));
-            this.gameObjects.forEach(go => go.update(dt));
-            this.gameObjects.forEach(go => go.lateUpdate(dt));
+        gameStage.scene.onBeforeRenderObservable.add(() => {
+            const dt = gameStage.scene.getEngine().getDeltaTime() / 1000;
+            this.update(dt);
         });
 
-        return this.scene;
+        return gameStage;
     }
 
     /**
-     * Creates and configures the player GameObject.
-     * Sets up the player with a visual component (box mesh) and basic positioning.
-     * @returns The configured player GameObject
+     * Updates all active stages.
+     * Called every frame by the game loop.
+     * @param dt Delta time in seconds since the last frame
      */
-    public createPlayer(): GameObject {
-        const player = new GameObject("Player", this.scene);
-
-        // attach visual
-        player.addComponent(new VisualComponent(async (scene) => {
-            Logger.debug('Starting to load PlayerVisual.glb');
-            let result = await ImportMeshAsync('./models/PlayerVisual.glb', scene);
-            const PlayerVisual = result.meshes[0];
-            PlayerVisual.position = Vector3.Zero();;
-            PlayerVisual.rotation = Vector3.Zero();;
-            PlayerVisual.receiveShadows = true;
-            this._shadowGenerator?.addShadowCaster(PlayerVisual);
-            
-            // Find Eye_R mesh and set its material to black
-            const eyeRM = scene.getMeshByName("Eye_R");
-            if (eyeRM) {
-                const blackMaterial = new StandardMaterial("EyeR_Black_Material", scene);
-                blackMaterial.diffuseColor = new Color3(0, 0, 0); // Black color
-                blackMaterial.specularColor = new Color3(1, 1, 1); // White specular for shine
-                blackMaterial.specularPower = 128; // High specular power for sharp shine
-                blackMaterial.ambientColor = new Color3(0.1, 0.1, 0.1); // Slight ambient reflection
-                eyeRM.material = blackMaterial;
-                Logger.debug("Eye_R material set to black");
-            } else {
-                Logger.warn("Eye_R mesh not found in PlayerVisual.glb");
+    public update(dt: number): void {
+        this.stages.forEach(stage => {
+            if (stage.started) {
+                stage.update(dt);
             }
-            
-            Logger.debug("PlayerVisual.glb loaded successfully");
-            return PlayerVisual;
-        }));
-
-        // attach movement
-        player.addComponent(new CharacterMovementComponent());
-
-        return player;
-    }
-
-        /**
-     * Creates and returns a standard material with a diffuse texture for the ground.
-     * The texture is scaled to repeat tileX times along the U axis and tileY times along the V axis.
-     *
-     * @param {string} textureUrl The URL of the diffuse texture.
-     * @param {number} tileX The number of times to repeat the texture along the U axis.
-     * @param {number} tileY The number of times to repeat the texture along the V axis.
-     *
-     * @returns {StandardMaterial} The created ground material with the applied texture.
-     */
-    private createGroundMaterial(textureUrl: string, tileX: number, tileY: number): StandardMaterial {
-        const groundTexture = new Texture(textureUrl, this.scene);
-        groundTexture.uScale = tileX;
-        groundTexture.vScale = tileY;
-
-        const groundMaterial = new StandardMaterial("groundMaterial", this.scene);
-        groundMaterial.diffuseTexture = groundTexture;
-        return groundMaterial;
+        });
     }
 
     /**
-     * Creates and returns a ground mesh with a standard material that has a diffuse texture.
-     * The ground mesh is created with MeshBuilder.CreateGround() and the texture is scaled to repeat tileX times along the U axis and tileY times along the V axis.
-     *
-     * @param {number} width The width of the ground mesh.
-     * @param {number} height The height of the ground mesh.
-     * @param {string} textureUrl The URL of the diffuse texture.
-     * @param {number} tileX The number of times to repeat the texture along the U axis.
-     * @param {number} tileY The number of times to repeat the texture along the V axis.
-     *
-     * @returns {GroundMesh} The created ground mesh.
+     * Gets the current active scene from the active stage.
+     * @returns The active scene or null if no stage is active
      */
-    private createGround(width: number, height: number, textureUrl: string, tileX: number, tileY: number): GroundMesh {
-        const ground = MeshBuilder.CreateGround("ground", { width: width, height: height }, this.scene);
-        ground.position = Vector3.Zero();
-        ground.material = this.createGroundMaterial(textureUrl, tileX, tileY);
-        ground.receiveShadows = true;
-        return ground;
+    public getActiveScene(): any {
+        return this.activeStage?.scene || null;
     }
 }

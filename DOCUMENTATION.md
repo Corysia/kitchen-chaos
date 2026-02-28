@@ -8,6 +8,8 @@
       - [`Main`](#main)
       - [`Logger`](#logger)
       - [`StageManager`](#stagemanager)
+      - [`Stage`](#stage)
+      - [`GameStage`](#gamestage)
       - [`GameObject`](#gameobject)
     - [Component System](#component-system)
       - [`Component`](#component)
@@ -70,7 +72,8 @@ The main application class that initializes and starts the game.
 - Configures logging levels and timestamp formats
 - Handles keyboard shortcuts (Shift+Ctrl+Alt+F for fullscreen, Shift+Ctrl+Alt+I for inspector)
 - Creates HTML canvas and BabylonJS engine
-- Initializes StageManager and creates the game scene
+- Initializes StageManager and creates the game stage
+- Sets up canvas focus for keyboard input
 
 ---
 
@@ -111,9 +114,9 @@ A static utility class for logging with configurable levels and timestamp format
 
 #### `StageManager`
 
-**Location**: `src/framework/SceneManager.ts`
+**Location**: `src/framework/StageManager.ts`
 
-A singleton class that manages BabylonJS engine, scene, GameObjects, and the main game loop.
+A singleton class that manages multiple stages, coordinates the main game loop, and handles stage transitions.
 
 **Static Properties**:
 
@@ -122,10 +125,9 @@ A singleton class that manages BabylonJS engine, scene, GameObjects, and the mai
 **Instance Properties**:
 
 - `engine`: The BabylonJS engine
-- `scene`: The main game scene
-- `gameObjects`: Array of all active GameObjects
+- `stages`: Array of all active stages
+- `activeStage`: The currently active stage
 - `started`: Flag indicating if the game has started
-- `inputSystem`: Global input system for handling user input
 
 **Static Methods**:
 
@@ -134,15 +136,75 @@ A singleton class that manages BabylonJS engine, scene, GameObjects, and the mai
 
 **Instance Methods**:
 
-- `createScene()`: Creates and initializes the main game scene
-- `createPlayer()`: Creates and configures the player GameObject
+- `addStage(stage)`: Adds a stage to the manager
+- `removeStage(stage)`: Removes a stage and disposes it
+- `setActiveStage(stage)`: Sets the active stage
+- `createGameStage()`: Creates and initializes the main game stage
+- `update(dt)`: Updates all active stages
+- `getActiveScene()`: Gets the current active scene
 
 **Key Features**:
 
-- Manages GameObject lifecycle (awake, start, update)
-- Coordinates the main game loop with proper timing
-- Sets up input system and basic scene (camera, light, ground)
-- Creates player GameObject with visual and movement components
+- Manages multiple stages with lifecycle coordination
+- Coordinates the main game loop across all stages
+- Handles stage transitions and resource management
+- Provides access to the current active scene
+
+---
+
+#### `Stage`
+
+**Location**: `src/framework/Stage.ts`
+
+Abstract base class for all game stages. A stage represents a self-contained scene with its own GameObjects and lifecycle.
+
+**Properties**:
+
+- `scene`: The BabylonJS scene for this stage
+- `gameObjects`: Array of all active GameObjects in this stage
+- `started`: Flag indicating if the stage has started
+
+**Methods**:
+
+- `initialize(engine)`: Abstract method to initialize the stage
+- `start()`: Called when the stage should start its game loop
+- `update(dt)`: Updates all GameObjects in the stage
+- `addGameObject(gameObject)`: Adds a GameObject to this stage
+- `removeGameObject(gameObject)`: Removes a GameObject from this stage
+- `dispose()`: Cleans up the stage and disposes of all resources
+
+**Key Features**:
+
+- Scene management and lifecycle
+- GameObject coordination within the stage
+- Stage-specific initialization and cleanup
+
+---
+
+#### `GameStage`
+
+**Location**: `src/framework/GameStage.ts`
+
+Concrete implementation of Stage for the main game scene. Contains the kitchen chaos game environment with player, counters, and game objects.
+
+**Properties**:
+
+- `inputSystem`: Global input system for handling user input
+
+**Methods**:
+
+- `initialize(engine)`: Initializes the game stage with the kitchen chaos scene
+- `createPlayer()`: Creates and configures the player GameObject
+- `loadKitchenCounters()`: Loads all kitchen counter models
+- `createGround()`: Creates the ground mesh with texture
+- `createGroundMaterial()`: Creates ground material with texture
+
+**Key Features**:
+
+- Sets up camera, lighting, ground, player, and kitchen counters
+- Manages the input system for the game stage
+- Loads 3D models for kitchen environment
+- Configures player visual components and movement
 
 ---
 
@@ -237,14 +299,15 @@ Component for character movement control using the input system.
 
 **Methods**:
 
-- `awake()`: Sets up input system listeners
+- `awake()`: Sets up input system listeners by accessing the active GameStage
 - `update(dt)`: Processes input and updates GameObject position
 
 **Key Features**:
 
 - Responds to MoveForward, MoveBackward, MoveLeft, MoveRight actions
-- Uses InputSystem for action-based input handling
+- Gets InputSystem from the active GameStage instance
 - Updates GameObject transform based on input
+- Includes error handling for missing active stage
 
 ---
 
@@ -348,14 +411,39 @@ classDiagram
     class StageManager {
         -static _instance: StageManager
         -engine: Engine
-        -scene: Scene
-        -gameObjects: Array~GameObject~
+        -stages: Array~Stage~
+        -activeStage: Stage
         -started: boolean
-        -inputSystem: InputSystem
         +static instance: StageManager
         +static initialize(engine) StageManager
-        +createScene() Scene
+        +addStage(stage) void
+        +removeStage(stage) void
+        +setActiveStage(stage) void
+        +createGameStage() Stage
+        +update(dt) void
+        +getActiveScene() Scene
+    }
+    
+    class Stage {
+        <<abstract>>
+        +scene: Scene
+        +gameObjects: Array~GameObject~
+        +started: boolean
+        +initialize(engine) void
+        +start() void
+        +update(dt) void
+        +addGameObject(gameObject) void
+        +removeGameObject(gameObject) void
+        +dispose() void
+    }
+    
+    class GameStage {
+        +inputSystem: InputSystem
+        +initialize(engine) void
         +createPlayer() GameObject
+        +loadKitchenCounters() void
+        +createGround() GroundMesh
+        +createGroundMaterial() StandardMaterial
     }
     
     class Logger {
@@ -471,8 +559,11 @@ classDiagram
     %% Relationships
     Main --> StageManager : creates
     Main --> Logger : configures
-    StageManager --> GameObject : manages
-    StageManager --> InputSystem : creates
+    StageManager --> Stage : manages
+    StageManager --> GameStage : creates
+    GameStage --|> Stage : extends
+    Stage --> GameObject : manages
+    GameStage --> InputSystem : creates
     GameObject --> Component : has
     GameObject --> GameObject : parent-child
     VisualComponent --|> Component : extends
@@ -481,7 +572,7 @@ classDiagram
     InputSystem --> InputAction : uses
     Logger --> LogLevel : uses
     Logger --> LogTimestampFormat : uses
-    CharacterMovementComponent --> InputSystem : uses
+    CharacterMovementComponent --> GameStage : uses for input
 ```
 
 ### Sequence Diagram - Application Startup
@@ -492,6 +583,7 @@ sequenceDiagram
     participant Logger
     participant StageManager
     participant Engine
+    participant GameStage
     participant Scene
     participant InputSystem
     participant GameObject
@@ -501,26 +593,32 @@ sequenceDiagram
     Main->>Engine: new Engine(canvas)
     Main->>StageManager: initialize(engine)
     
-    StageManager->>StageManager: createScene()
-    StageManager->>Scene: new Scene(engine)
-    StageManager->>InputSystem: new InputSystem(scene)
+    Main->>StageManager: createGameStage()
+    StageManager->>GameStage: new GameStage()
+    StageManager->>GameStage: initialize(engine)
     
-    StageManager->>Scene: create camera
-    StageManager->>Scene: create light
-    StageManager->>Scene: create ground
+    GameStage->>Scene: new Scene(engine)
+    GameStage->>InputSystem: new InputSystem(scene)
     
-    StageManager->>StageManager: createPlayer()
-    StageManager->>GameObject: new GameObject("Player", scene)
+    GameStage->>Scene: create camera
+    GameStage->>Scene: create light
+    GameStage->>Scene: create ground
+    
+    GameStage->>GameStage: createPlayer()
+    GameStage->>GameObject: new GameObject("Player", scene)
     GameObject->>GameObject: addComponent(VisualComponent)
     GameObject->>GameObject: addComponent(CharacterMovementComponent)
-    StageManager->>StageManager: gameObjects.push(player)
+    GameStage->>GameStage: addGameObject(player)
     
-    StageManager->>GameObject: awake()
+    GameStage->>GameObject: awake()
     GameObject->>Component: awake()
     
+    StageManager->>StageManager: addStage(gameStage)
+    StageManager->>StageManager: setActiveStage(gameStage)
+    
     Note over StageManager,Scene: Setup render observers
-    StageManager->>Scene: onBeforeRenderObservable.add(awake/start)
-    StageManager->>Scene: onBeforeRenderObservable.add(update loop)
+    GameStage->>Scene: onBeforeRenderObservable.add(awake/start)
+    GameStage->>Scene: onBeforeRenderObservable.add(update loop)
     
     Main->>Engine: runRenderLoop()
     Engine->>Engine: render() every frame
@@ -531,39 +629,40 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant StageManager
+    participant Stage
     participant GameObject
     participant Component
     participant Scene
     
     Note over StageManager,Scene: GameObject Creation
-    StageManager->>GameObject: new GameObject(name, scene)
+    Stage->>GameObject: new GameObject(name, scene)
     GameObject->>Scene: new TransformNode(name, scene)
     GameObject->>GameObject: addComponent(component)
     Component->>Component: gameObject = this GameObject
     
     Note over StageManager,Scene: Initialization Phase
-    StageManager->>GameObject: awake()
+    Stage->>GameObject: awake()
     GameObject->>Component: awake()
     GameObject->>GameObject: children.forEach(awake)
     
     Note over StageManager,Scene: Start Phase (first frame)
-    Scene->>StageManager: onBeforeRender (first time)
-    StageManager->>GameObject: start()
+    Scene->>Stage: onBeforeRender (first time)
+    Stage->>GameObject: start()
     GameObject->>Component: start()
     GameObject->>GameObject: children.forEach(start)
     
     Note over StageManager,Scene: Game Loop (Every Frame)
     loop Each Frame
-        Scene->>StageManager: onBeforeRender
-        StageManager->>GameObject: earlyUpdate(dt)
+        Scene->>Stage: onBeforeRender
+        Stage->>GameObject: earlyUpdate(dt)
         GameObject->>Component: earlyUpdate(dt)
         GameObject->>GameObject: children.forEach(earlyUpdate)
         
-        StageManager->>GameObject: update(dt)
+        Stage->>GameObject: update(dt)
         GameObject->>Component: update(dt)
         GameObject->>GameObject: children.forEach(update)
         
-        StageManager->>GameObject: lateUpdate(dt)
+        Stage->>GameObject: lateUpdate(dt)
         GameObject->>Component: lateUpdate(dt)
         GameObject->>GameObject: children.forEach(lateUpdate)
         
@@ -585,15 +684,18 @@ sequenceDiagram
     participant InputSystem
     participant CharacterMovementComponent
     participant GameObject
+    participant GameStage
     
-    Note over Browser,GameObject: Initialization
+    Note over Browser,GameStage: Initialization
     GameObject->>CharacterMovementComponent: awake()
+    CharacterMovementComponent->>GameStage: Get active stage from StageManager
+    GameStage->>CharacterMovementComponent: Return inputSystem
     CharacterMovementComponent->>InputSystem: on(MoveForward, callback)
     CharacterMovementComponent->>InputSystem: on(MoveBackward, callback)
     CharacterMovementComponent->>InputSystem: on(MoveLeft, callback)
     CharacterMovementComponent->>InputSystem: on(MoveRight, callback)
     
-    Note over Browser,GameObject: Input Processing Loop
+    Note over Browser,GameStage: Input Processing Loop
     loop Each Frame
         Browser->>InputSystem: keydown event (KeyW)
         InputSystem->>InputSystem: keyState.add(key)
@@ -620,8 +722,10 @@ src/
 ├── main.ts                      # Application entry point
 ├── vite-env.d.ts                # Vite environment types
 └── framework/                   # Core framework
+    ├── Stage.ts                  # Abstract base stage class
+    ├── StageManager.ts           # Singleton stage manager
+    ├── GameStage.ts             # Concrete game stage implementation
     ├── GameObject.ts            # Base GameObject class
-    ├── StageManager.ts          # Singleton stage manager
     ├── components/              # Component system
     │   ├── Component.ts         # Base component class
     │   ├── VisualComponent.ts   # Visual/mesh component
@@ -670,12 +774,14 @@ src/
 ## Development Notes
 
 1. **Logging**: Configure log levels in `Main.initialize()` for debugging
-2. **Scene Management**: Use `StageManager` for all scene and GameObject operations
-3. **GameObject System**: Extend `GameObject` for game objects, use composition with components
-4. **Components**: Create components by extending `Component` class, attach to GameObjects
-5. **Input**: Use `InputSystem` for action-based input handling with configurable bindings
-6. **Lifecycle**: Follow the awake -> start -> earlyUpdate -> update -> lateUpdate pattern
-7. **Hierarchy**: Use parent-child relationships for organized scene structure
+2. **Stage Management**: Use `StageManager` for stage lifecycle and coordination
+3. **Stage System**: Create custom stages by extending `Stage` class
+4. **GameObject System**: Extend `GameObject` for game objects, use composition with components
+5. **Components**: Create components by extending `Component` class, attach to GameObjects
+6. **Input**: Use `InputSystem` for action-based input handling with configurable bindings
+7. **Lifecycle**: Follow to awake -> start -> earlyUpdate -> update -> lateUpdate pattern
+8. **Hierarchy**: Use parent-child relationships for organized scene structure
+9. **Game Stages**: Use `GameStage` for main game logic or create custom stage types
 
 ## Getting Started
 

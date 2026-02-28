@@ -1,6 +1,7 @@
 import { InputSystem } from "../input/InputSystem";
 import { Component } from "./Component";
 import { StageManager } from "../StageManager";
+import { GameStage } from "../../Stages/GameStage";
 import { InputAction } from "../input/InputAction";
 
 export class CharacterMovementComponent extends Component {
@@ -8,8 +9,14 @@ export class CharacterMovementComponent extends Component {
   speed = 5;
 
   awake() {
-    // get the InputSystem from somewhere (SceneManager, DI, or global)
-    this.input = StageManager.instance.inputSystem;
+    // get the InputSystem from the active GameStage
+    const activeStage = StageManager.instance.activeStage;
+    
+    if (activeStage && activeStage instanceof GameStage) {
+      this.input = activeStage.inputSystem;
+    } else {
+      throw new Error("No active GameStage found or active stage is not a GameStage");
+    }
 
     this.input.on(InputAction.MoveForward, active => this.forward = active);
     this.input.on(InputAction.MoveBackward, active => this.backward = active);

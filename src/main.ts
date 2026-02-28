@@ -23,23 +23,29 @@ class Main {
         
         // Set BabylonJS logger to DEBUG level equivalent
         // In production, only show errors and warnings from BabylonJS
-        // TODO: re-enable this later
-        // if (import.meta.env.PROD) {
-            // BabylonLoggerClass.LogLevels = 1; // ERROR level only
-        // } else {
-            // BabylonLoggerClass.LogLevels = 4; // DEBUG level in development
-            BabylonLoggerClass.LogLevels = 7; // ALL level in development
-        // }
+        if (import.meta.env.PROD) {
+            BabylonLoggerClass.LogLevels = 1; // ERROR level only
+        } else {
+            BabylonLoggerClass.LogLevels = 4; // DEBUG level in development
+        }
         
         this.canvas = document.createElement("canvas");
         this.canvas.style.width = '100%';
         this.canvas.style.height = '100%';
+        this.canvas.tabIndex = 0; // Make canvas focusable
         document.body.appendChild(this.canvas);
+        this.canvas.focus(); // Ensure canvas has focus for input
+        
+        // Add click listener to ensure canvas stays focused
+        this.canvas.addEventListener('click', () => {
+            this.canvas.focus();
+        });
         this.engine = new Engine(this.canvas, true);
         
         // Initialize StageManager
         this.stageManager = StageManager.initialize(this.engine);
-        const scene = await this.stageManager.createScene();
+        const stage = await this.stageManager.createGameStage();
+        const scene = stage.scene;
         
         this.onSceneCreated(scene);
     }
@@ -72,16 +78,16 @@ class Main {
                 this.engine.switchFullscreen(false);
             }
             // Shift+Ctrl+Alt+I
-            // TODO: re-enable this later
-            // if (!import.meta.env.PROD) {
+            if (!import.meta.env.PROD) {
                 if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === "KeyI") {
-                    if (this.stageManager.scene.debugLayer.isVisible()) {
-                        this.stageManager.scene.debugLayer.hide();
-                    } else {
-                        this.stageManager.scene.debugLayer.show();
+                    const activeScene = this.stageManager.getActiveScene();
+                    if (activeScene?.debugLayer.isVisible()) {
+                        activeScene.debugLayer.hide();
+                    } else if (activeScene) {
+                        activeScene.debugLayer.show();
                     }
                 }
-            // } 
+            } 
         });
     }
 }
