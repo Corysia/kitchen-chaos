@@ -20,6 +20,9 @@ export abstract class Stage implements Lifecycle {
     
     /** Flag indicating if the stage has started */
     public started = false;
+    
+    /** Flag indicating if the stage has been initialized */
+    public initialized = false;
 
     /**
      * Initializes the stage and creates its scene.
@@ -45,9 +48,11 @@ export abstract class Stage implements Lifecycle {
     public async start(): Promise<void> {
         if (this.started) return;
         
-        this.started = true;
         const promises = this.gameObjects.map(go => go.start());
         await Promise.all(promises);
+        
+        // Only set started to true after all start calls complete
+        this.started = true;
     }
 
     /**

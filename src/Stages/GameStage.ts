@@ -57,6 +57,9 @@ export class GameStage extends Stage {
 
         // call awake on all objects
         await Promise.all(this.gameObjects.map(go => go.awake()));
+        
+        // Mark stage as initialized
+        this.initialized = true;
     }
 
     /**

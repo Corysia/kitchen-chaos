@@ -35,6 +35,7 @@ describe('Framework Simple Tests', () => {
             const stage = {
                 gameObjects: [],
                 started: false,
+                initialized: false,
                 scene: { dispose: vi.fn() } as any,
                 initialize: vi.fn(),
                 awake: vi.fn(),
@@ -55,6 +56,7 @@ describe('Framework Simple Tests', () => {
             const stage = {
                 gameObjects: [],
                 started: false,
+                initialized: false,
                 scene: { dispose: vi.fn() } as any,
                 initialize: vi.fn(),
                 awake: vi.fn(),
@@ -75,6 +77,7 @@ describe('Framework Simple Tests', () => {
             const stage = {
                 gameObjects: [],
                 started: false,
+                initialized: false,
                 scene: { dispose: vi.fn() } as any,
                 initialize: vi.fn(),
                 awake: vi.fn(),
@@ -95,6 +98,7 @@ describe('Framework Simple Tests', () => {
             const stage = {
                 gameObjects: [],
                 started: true,
+                initialized: true,
                 scene: { dispose: vi.fn() } as any,
                 initialize: vi.fn(),
                 awake: vi.fn(),

@@ -102,7 +102,7 @@ export class StageManager {
      * @param dt Delta time in seconds since the last frame
      */
     public async update(dt: number): Promise<void> {
-        if (this.activeStage?.started) {
+        if (this.activeStage && this.activeStage.started && this.activeStage.initialized) {
             await this.activeStage.earlyUpdate(dt);
             await this.activeStage.update(dt);
             await this.activeStage.lateUpdate(dt);
