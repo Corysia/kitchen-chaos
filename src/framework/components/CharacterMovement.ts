@@ -8,7 +8,7 @@ export class CharacterMovementComponent extends Component {
   input!: InputSystem;
   speed = 5;
 
-  awake() {
+  async awake() {
     // get the InputSystem from the active GameStage
     const activeStage = StageManager.instance.activeStage;
     
@@ -33,7 +33,7 @@ export class CharacterMovementComponent extends Component {
   right = false;
   jumpRequested = false;
 
-  update(dt: number) {
+  async update(dt: number) {
     const t = this.gameObject.transform;
 
     let dx = 0;

@@ -19,48 +19,87 @@ class Main {
      * Sets up event listeners and starts render loop
      */
     public async initialize(): Promise<void> {
-        Logger.setTimestampFormat(LogTimestampFormat.ISO);
-        Logger.setLogLevel(LogLevel.TRACE);
-        
-        // Set BabylonJS logger to DEBUG level equivalent
-        // In production, only show errors and warnings from BabylonJS
-        if (import.meta.env.PROD) {
-            BabylonLoggerClass.LogLevels = 1; // ERROR level only
-        } else {
-            BabylonLoggerClass.LogLevels = 4; // DEBUG level in development
+        try {
+            Logger.setTimestampFormat(LogTimestampFormat.ISO);
+            Logger.setLogLevel(LogLevel.TRACE);
+            
+            // Set BabylonJS logger to DEBUG level equivalent
+            // In production, only show errors and warnings from BabylonJS
+            if (import.meta.env.PROD) {
+                BabylonLoggerClass.LogLevels = 1; // ERROR level only
+            } else {
+                BabylonLoggerClass.LogLevels = 4; // DEBUG level in development
+            }
+            
+            this.canvas = document.createElement("canvas");
+            this.canvas.style.width = '100%';
+            this.canvas.style.height = '100%';
+            this.canvas.tabIndex = 0; // Make canvas focusable
+            document.body.appendChild(this.canvas);
+            this.canvas.focus(); // Ensure canvas has focus for input
+            
+            // Add click listener to ensure canvas stays focused
+            this.canvas.addEventListener('click', () => {
+                this.canvas.focus();
+            });
+            this.engine = new Engine(this.canvas, true);
+            
+            // Initialize StageManager
+            this.stageManager = StageManager.initialize(this.engine);
+            
+            // Create and initialize GameStage
+            const gameStage = new GameStage();
+            this.stageManager.addStage(gameStage);
+            await this.stageManager.setActiveStage(gameStage); // Set as active BEFORE initialization
+            await gameStage.initialize(this.engine);
+            await gameStage.start();
+            
+            // Set up update loop
+            gameStage.scene.onBeforeRenderObservable.add(async () => {
+                const dt = gameStage.scene.getEngine().getDeltaTime() / 1000;
+                await this.stageManager.update(dt);
+            });
+            
+            const scene = gameStage.scene;
+            this.onSceneCreated(scene);
+            
+            Logger.info('Game initialized successfully');
+        } catch (error) {
+            Logger.error('Failed to initialize game', error);
+            
+            // Display user-friendly error message
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #ff4444;
+                color: white;
+                padding: 20px;
+                border-radius: 8px;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                z-index: 1000;
+            `;
+            errorDiv.innerHTML = `
+                <h2>Game Initialization Failed</h2>
+                <p>${errorMessage}</p>
+                <button onclick="location.reload()" style="
+                    background: white;
+                    color: #ff4444;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    margin-top: 10px;
+                ">Reload</button>
+            `;
+            document.body.appendChild(errorDiv);
+            
+            throw error;
         }
-        
-        this.canvas = document.createElement("canvas");
-        this.canvas.style.width = '100%';
-        this.canvas.style.height = '100%';
-        this.canvas.tabIndex = 0; // Make canvas focusable
-        document.body.appendChild(this.canvas);
-        this.canvas.focus(); // Ensure canvas has focus for input
-        
-        // Add click listener to ensure canvas stays focused
-        this.canvas.addEventListener('click', () => {
-            this.canvas.focus();
-        });
-        this.engine = new Engine(this.canvas, true);
-        
-        // Initialize StageManager
-        this.stageManager = StageManager.initialize(this.engine);
-        
-        // Create and initialize GameStage
-        const gameStage = new GameStage();
-        this.stageManager.addStage(gameStage);
-        this.stageManager.setActiveStage(gameStage); // Set as active BEFORE initialization
-        await gameStage.initialize(this.engine);
-        gameStage.start();
-        
-        // Set up update loop
-        gameStage.scene.onBeforeRenderObservable.add(() => {
-            const dt = gameStage.scene.getEngine().getDeltaTime() / 1000;
-            this.stageManager.update(dt);
-        });
-        
-        const scene = gameStage.scene;
-        this.onSceneCreated(scene);
     }
 
     /**

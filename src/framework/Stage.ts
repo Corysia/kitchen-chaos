@@ -1,4 +1,4 @@
-import { Scene } from "@babylonjs/core";
+import { Scene, Engine } from "@babylonjs/core";
 import { GameObject } from "./GameObject";
 import { Lifecycle } from "./interfaces/Lifecycle";
 
@@ -27,25 +27,27 @@ export abstract class Stage implements Lifecycle {
      * @param engine The Babylon.js engine to use for scene creation
      * @returns Promise that resolves when the stage is fully initialized
      */
-    public abstract initialize(engine: any): Promise<void>;
+    public abstract initialize(engine: Engine): Promise<void>;
 
     /**
      * Called when the stage is created. Sets up initial state.
      * Default implementation calls awake on all GameObjects.
      */
-    public awake(): void {
-        this.gameObjects.forEach(go => go.awake());
+    public async awake(): Promise<void> {
+        const promises = this.gameObjects.map(go => go.awake());
+        await Promise.all(promises);
     }
 
     /**
      * Called when the stage should start its game loop.
      * Sets up update loops and calls start on all GameObjects.
      */
-    public start(): void {
+    public async start(): Promise<void> {
         if (this.started) return;
         
         this.started = true;
-        this.gameObjects.forEach(go => go.start());
+        const promises = this.gameObjects.map(go => go.start());
+        await Promise.all(promises);
     }
 
     /**
@@ -53,8 +55,9 @@ export abstract class Stage implements Lifecycle {
      * Called every frame by the StageManager.
      * @param dt Delta time in seconds since the last frame
      */
-    public update(dt: number): void {
-        this.gameObjects.forEach(go => go.update(dt));
+    public async update(dt: number): Promise<void> {
+        const promises = this.gameObjects.map(go => go.update(dt));
+        await Promise.all(promises);
     }
 
     /**
@@ -62,8 +65,9 @@ export abstract class Stage implements Lifecycle {
      * Calls earlyUpdate on all GameObjects.
      * @param dt Delta time in seconds since the last frame
      */
-    public earlyUpdate(dt: number): void {
-        this.gameObjects.forEach(go => go.earlyUpdate(dt));
+    public async earlyUpdate(dt: number): Promise<void> {
+        const promises = this.gameObjects.map(go => go.earlyUpdate(dt));
+        await Promise.all(promises);
     }
 
     /**
@@ -71,8 +75,9 @@ export abstract class Stage implements Lifecycle {
      * Calls lateUpdate on all GameObjects.
      * @param dt Delta time in seconds since the last frame
      */
-    public lateUpdate(dt: number): void {
-        this.gameObjects.forEach(go => go.lateUpdate(dt));
+    public async lateUpdate(dt: number): Promise<void> {
+        const promises = this.gameObjects.map(go => go.lateUpdate(dt));
+        await Promise.all(promises);
     }
 
     /**
@@ -98,8 +103,9 @@ export abstract class Stage implements Lifecycle {
     /**
      * Cleans up the stage and disposes of all resources.
      */
-    public dispose(): void {
-        this.gameObjects.forEach(go => go.destroy());
+    public async dispose(): Promise<void> {
+        const promises = this.gameObjects.map(go => go.destroy());
+        await Promise.all(promises);
         this.gameObjects = [];
         if (this.scene) {
             this.scene.dispose();

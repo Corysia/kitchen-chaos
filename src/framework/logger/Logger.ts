@@ -39,7 +39,7 @@ export enum LogTimestampFormat {
 export class Logger {
 
     private static _instance: Logger;
-    private static readonly production: boolean = false; // TODO: set to import.meta.env.PROD;
+    private static readonly production: boolean = import.meta.env.PROD;
     private static logLevel: LogLevel = LogLevel.ERROR;
     private static timestampFormat: LogTimestampFormat = LogTimestampFormat.ISO;
 
@@ -67,7 +67,7 @@ export class Logger {
      * Logger.info('Application started');
      * ```
      */
-    public static info(message?: any, ...optionalParams: any[]): void {
+    public static info(message?: unknown, ...optionalParams: unknown[]): void {
         if (Logger.logLevel < LogLevel.INFO || Logger.production) return;
         console.log(`[${Logger.timestamp}] ${message}`, ...optionalParams);
     }
@@ -84,7 +84,7 @@ export class Logger {
      * Logger.debug('Internal state', state);
      * ```
      */
-    public static debug(message?: any, ...optionalParams: any[]): void {
+    public static debug(message?: unknown, ...optionalParams: unknown[]): void {
         if (Logger.logLevel < LogLevel.DEBUG || Logger.production) return;
         console.log(`[${Logger.timestamp}] ${message}`, ...optionalParams);
     }
@@ -101,7 +101,7 @@ export class Logger {
      * Logger.error('Database connection failed', error);
      * ```
      */
-    public static error(message?: any, ...optionalParams: any[]): void {
+    public static error(message?: unknown, ...optionalParams: unknown[]): void {
         if (Logger.logLevel < LogLevel.ERROR) return;
         console.error(`[${Logger.timestamp}] ${message}`, ...optionalParams);
     }
@@ -118,7 +118,7 @@ export class Logger {
      * Logger.warn('Deprecated API used', apiName);
      * ```
      */
-    public static warn(message?: any, ...optionalParams: any[]): void {
+    public static warn(message?: unknown, ...optionalParams: unknown[]): void {
         if (Logger.logLevel < LogLevel.WARN) return;
         console.warn(`[${Logger.timestamp}] ${message}`, ...optionalParams);
     }
@@ -213,7 +213,7 @@ export class Logger {
      * Logger.trace('Entering function', functionName);
      * ```
      */
-    public static trace(message?: any, ...optionalParams: any[]): void {
+    public static trace(message?: unknown, ...optionalParams: unknown[]): void {
         if (Logger.logLevel < LogLevel.TRACE || Logger.production) return;
         console.trace(message, ...optionalParams);
     }
@@ -252,7 +252,7 @@ export class Logger {
      * Logger.dir(userObject);
      * ```
      */
-    public static dir(message?: any, ...optionalParams: any[]): void {
+    public static dir(message?: unknown, ...optionalParams: unknown[]): void {
         if (Logger.logLevel === LogLevel.NONE || Logger.production) return;
         console.dir(message, ...optionalParams);
     }
@@ -269,7 +269,7 @@ export class Logger {
      * Logger.dirxml(xmlElement);
      * ```
      */
-    public static dirxml(value: any): void {
+    public static dirxml(value: unknown): void {
         if (Logger.logLevel === LogLevel.NONE || Logger.production) return;
         console.dirxml(value);
     }
@@ -287,7 +287,7 @@ export class Logger {
      * Logger.table([{name: 'John', age: 30}, {name: 'Jane', age: 25}]);
      * ```
      */
-    public static table(tabularData: any, properties?: string[]): void {
+    public static table(tabularData: unknown, properties?: string[]): void {
         if (Logger.logLevel === LogLevel.NONE || Logger.production) return;
         console.table(tabularData, properties);
     }

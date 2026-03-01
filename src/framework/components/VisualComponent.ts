@@ -16,7 +16,7 @@ export class VisualComponent extends Component {
     this.mesh.parent = this.gameObject.transform;
   }
 
-  destroy() {
+  async destroy() {
     this.mesh.dispose();
   }
 }

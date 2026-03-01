@@ -1,4 +1,4 @@
-import { Engine } from "@babylonjs/core";
+import { Engine, Scene } from "@babylonjs/core";
 import { Stage } from "./Stage";
 
 /**
@@ -77,11 +77,11 @@ export class StageManager {
      * Removes a stage from the manager and disposes it.
      * @param stage The stage to remove
      */
-    public removeStage(stage: Stage): void {
+    public async removeStage(stage: Stage): Promise<void> {
         const index = this.stages.indexOf(stage);
         if (index > -1) {
             this.stages.splice(index, 1);
-            stage.dispose();
+            await stage.dispose();
         }
     }
 
@@ -89,7 +89,7 @@ export class StageManager {
      * Sets the active stage.
      * @param stage The stage to make active
      */
-    public setActiveStage(stage: Stage): void {
+    public async setActiveStage(stage: Stage): Promise<void> {
         if (this.activeStage) {
             this.activeStage.started = false;
         }
@@ -101,11 +101,11 @@ export class StageManager {
      * Called every frame by the game loop.
      * @param dt Delta time in seconds since the last frame
      */
-    public update(dt: number): void {
+    public async update(dt: number): Promise<void> {
         if (this.activeStage?.started) {
-            this.activeStage.earlyUpdate(dt);
-            this.activeStage.update(dt);
-            this.activeStage.lateUpdate(dt);
+            await this.activeStage.earlyUpdate(dt);
+            await this.activeStage.update(dt);
+            await this.activeStage.lateUpdate(dt);
         }
     }
 
@@ -113,7 +113,7 @@ export class StageManager {
      * Gets the current active scene from the active stage.
      * @returns The active scene or null if no stage is active
      */
-    public getActiveScene(): any {
+    public getActiveScene(): Scene | null {
         return this.activeStage?.scene || null;
     }
 }

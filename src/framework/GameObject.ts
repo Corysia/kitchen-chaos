@@ -78,7 +78,7 @@ export class GameObject {
    * Dispatches awake call to all components and children
    * Called when the GameObject is first initialized
    */
-  public async awake() { 
+  public async awake(): Promise<void> { 
     const componentPromises = this.components
       .map(c => c.awake?.())
       .filter((promise): promise is Promise<void> => promise !== undefined);
@@ -93,9 +93,15 @@ export class GameObject {
    * Dispatches start call to all components and children
    * Called once before the first frame update
    */
-  public start() { 
-    this.components.forEach(c => c.start?.());
-    this.children.forEach(child => child.start());
+  public async start(): Promise<void> { 
+    const componentPromises = this.components
+      .map(c => c.start?.())
+      .filter((promise): promise is Promise<void> => promise !== undefined);
+    
+    const childPromises = this.children
+      .map(child => child.start());
+    
+    await Promise.all([...componentPromises, ...childPromises]);
   }
   
   /**
@@ -103,9 +109,15 @@ export class GameObject {
    * Called every frame before the main update
    * @param dt Delta time in seconds since the last frame
    */
-  public earlyUpdate(dt: number) { 
-    this.components.forEach(c => c.earlyUpdate?.(dt));
-    this.children.forEach(child => child.earlyUpdate(dt));
+  public async earlyUpdate(dt: number): Promise<void> { 
+    const componentPromises = this.components
+      .map(c => c.earlyUpdate?.(dt))
+      .filter((promise): promise is Promise<void> => promise !== undefined);
+    
+    const childPromises = this.children
+      .map(child => child.earlyUpdate(dt));
+    
+    await Promise.all([...componentPromises, ...childPromises]);
   }
   
   /**
@@ -113,9 +125,15 @@ export class GameObject {
    * Called every frame for main game logic
    * @param dt Delta time in seconds since the last frame
    */
-  public update(dt: number) { 
-    this.components.forEach(c => c.update?.(dt));
-    this.children.forEach(child => child.update(dt));
+  public async update(dt: number): Promise<void> { 
+    const componentPromises = this.components
+      .map(c => c.update?.(dt))
+      .filter((promise): promise is Promise<void> => promise !== undefined);
+    
+    const childPromises = this.children
+      .map(child => child.update(dt));
+    
+    await Promise.all([...componentPromises, ...childPromises]);
   }
   
   /**
@@ -123,18 +141,31 @@ export class GameObject {
    * Called every frame after the main update
    * @param dt Delta time in seconds since the last frame
    */
-  public lateUpdate(dt: number) { 
-    this.components.forEach(c => c.lateUpdate?.(dt));
-    this.children.forEach(child => child.lateUpdate(dt));
+  public async lateUpdate(dt: number): Promise<void> { 
+    const componentPromises = this.components
+      .map(c => c.lateUpdate?.(dt))
+      .filter((promise): promise is Promise<void> => promise !== undefined);
+    
+    const childPromises = this.children
+      .map(child => child.lateUpdate(dt));
+    
+    await Promise.all([...componentPromises, ...childPromises]);
   }
   
   /**
    * Dispatches destroy call to all components and children
    * Called when the GameObject is being removed from the scene
    */
-  public destroy() {
-    this.components.forEach(c => c.destroy?.());
-    this.children.forEach(child => child.destroy());
+  public async destroy(): Promise<void> {
+    const componentPromises = this.components
+      .map(c => c.destroy?.())
+      .filter((promise): promise is Promise<void> => promise !== undefined);
+    
+    const childPromises = this.children
+      .map(child => child.destroy());
+    
+    await Promise.all([...componentPromises, ...childPromises]);
+    
     this.transform.dispose();
   }
 }

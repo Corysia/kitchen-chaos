@@ -184,7 +184,7 @@ Abstract base class for all game stages. A stage represents a self-contained sce
 
 #### `GameStage`
 
-**Location**: `src/framework/GameStage.ts`
+**Location**: `src/Stages/GameStage.ts`
 
 Concrete implementation of Stage for the main game scene. Contains the kitchen chaos game environment with player, counters, and game objects.
 
@@ -723,10 +723,11 @@ sequenceDiagram
 src/
 ├── main.ts                      # Application entry point
 ├── vite-env.d.ts                # Vite environment types
+├── Stages/                       # Game stage implementations
+│   └── GameStage.ts             # Concrete game stage implementation
 └── framework/                   # Core framework
     ├── Stage.ts                  # Abstract base stage class
     ├── StageManager.ts           # Singleton stage manager
-    ├── GameStage.ts             # Concrete game stage implementation
     ├── GameObject.ts            # Base GameObject class
     ├── components/              # Component system
     │   ├── Component.ts         # Base component class

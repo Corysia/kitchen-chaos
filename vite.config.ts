@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
     base: '/kitchen-chaos/',
     build: {
-        minify: false,
+        minify: true,
         rollupOptions: {
             onwarn(warning, warn) {
                 // Suppress "use client" directive warnings
