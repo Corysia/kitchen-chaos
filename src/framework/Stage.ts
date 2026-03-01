@@ -1,5 +1,6 @@
 import { Scene } from "@babylonjs/core";
 import { GameObject } from "./GameObject";
+import { Lifecycle } from "./interfaces/Lifecycle";
 
 /**
  * Abstract base class for all game stages.
@@ -10,7 +11,7 @@ import { GameObject } from "./GameObject";
  * - GameObject coordination within the stage
  * - Stage-specific initialization and cleanup
  */
-export abstract class Stage {
+export abstract class Stage implements Lifecycle {
     /** The Babylon.js scene for this stage */
     public scene!: Scene;
     
@@ -29,6 +30,14 @@ export abstract class Stage {
     public abstract initialize(engine: any): Promise<void>;
 
     /**
+     * Called when the stage is created. Sets up initial state.
+     * Default implementation calls awake on all GameObjects.
+     */
+    public awake(): void {
+        this.gameObjects.forEach(go => go.awake());
+    }
+
+    /**
      * Called when the stage should start its game loop.
      * Sets up update loops and calls start on all GameObjects.
      */
@@ -45,8 +54,24 @@ export abstract class Stage {
      * @param dt Delta time in seconds since the last frame
      */
     public update(dt: number): void {
-        this.gameObjects.forEach(go => go.earlyUpdate(dt));
         this.gameObjects.forEach(go => go.update(dt));
+    }
+
+    /**
+     * Called early in the frame before update.
+     * Calls earlyUpdate on all GameObjects.
+     * @param dt Delta time in seconds since the last frame
+     */
+    public earlyUpdate(dt: number): void {
+        this.gameObjects.forEach(go => go.earlyUpdate(dt));
+    }
+
+    /**
+     * Called late in the frame after update.
+     * Calls lateUpdate on all GameObjects.
+     * @param dt Delta time in seconds since the last frame
+     */
+    public lateUpdate(dt: number): void {
         this.gameObjects.forEach(go => go.lateUpdate(dt));
     }
 

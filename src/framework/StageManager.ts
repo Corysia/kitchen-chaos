@@ -1,6 +1,5 @@
 import { Engine } from "@babylonjs/core";
 import { Stage } from "./Stage";
-import { GameStage } from "../Stages/GameStage";
 
 /**
  * Singleton manager for stage lifecycle and coordination.
@@ -98,44 +97,16 @@ export class StageManager {
     }
 
     /**
-     * Creates and initializes the main game stage.
-     * Sets up the input system, creates the player GameObject, and starts the game loop.
-     * @returns Promise that resolves when the stage is created and initialized
-     */
-    public async createGameStage(): Promise<Stage> {
-        const gameStage = new GameStage();
-        this.addStage(gameStage);
-        this.setActiveStage(gameStage);
-        await gameStage.initialize(this.engine);
-        gameStage.start(); // Start the stage after initialization
-
-        // start after first render
-        gameStage.scene.onBeforeRenderObservable.add(() => {
-            if (!this.started && gameStage.started) {
-                this.started = true;
-            }
-        });
-
-        // update loop
-        gameStage.scene.onBeforeRenderObservable.add(() => {
-            const dt = gameStage.scene.getEngine().getDeltaTime() / 1000;
-            this.update(dt);
-        });
-
-        return gameStage;
-    }
-
-    /**
-     * Updates all active stages.
+     * Updates the active stage.
      * Called every frame by the game loop.
      * @param dt Delta time in seconds since the last frame
      */
     public update(dt: number): void {
-        this.stages.forEach(stage => {
-            if (stage.started) {
-                stage.update(dt);
-            }
-        });
+        if (this.activeStage?.started) {
+            this.activeStage.earlyUpdate(dt);
+            this.activeStage.update(dt);
+            this.activeStage.lateUpdate(dt);
+        }
     }
 
     /**

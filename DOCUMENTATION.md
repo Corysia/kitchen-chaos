@@ -63,7 +63,7 @@ The main application class that initializes and starts the game.
 
 **Methods**:
 
-- `initialize()`: Initializes logging, creates canvas and engine, sets up StageManager
+- `initialize()`: Initializes logging, creates canvas and engine, creates and configures GameStage
 - `private onSceneCreated(scene)`: Sets up event listeners and starts render loop
 - `private setupEventListeners()`: Adds keyboard shortcuts for fullscreen and debug layer
 
@@ -72,7 +72,8 @@ The main application class that initializes and starts the game.
 - Configures logging levels and timestamp formats
 - Handles keyboard shortcuts (Shift+Ctrl+Alt+F for fullscreen, Shift+Ctrl+Alt+I for inspector)
 - Creates HTML canvas and BabylonJS engine
-- Initializes StageManager and creates the game stage
+- Creates GameStage instance and initializes it
+- Passes GameStage to StageManager for management
 - Sets up canvas focus for keyboard input
 
 ---
@@ -139,16 +140,16 @@ A singleton class that manages multiple stages, coordinates the main game loop, 
 - `addStage(stage)`: Adds a stage to the manager
 - `removeStage(stage)`: Removes a stage and disposes it
 - `setActiveStage(stage)`: Sets the active stage
-- `createGameStage()`: Creates and initializes the main game stage
-- `update(dt)`: Updates all active stages
+- `update(dt)`: Updates the active stage
 - `getActiveScene()`: Gets the current active scene
 
 **Key Features**:
 
 - Manages multiple stages with lifecycle coordination
-- Coordinates the main game loop across all stages
+- Coordinates the main game loop for the active stage
 - Handles stage transitions and resource management
 - Provides access to the current active scene
+- Pure stage management without creation responsibilities
 
 ---
 
@@ -560,8 +561,10 @@ classDiagram
     Main --> StageManager : creates
     Main --> Logger : configures
     StageManager --> Stage : manages
-    StageManager --> GameStage : creates
+    Main --> GameStage : creates
     GameStage --|> Stage : extends
+    Stage --|> Lifecycle : implements
+    GameObject --|> Lifecycle : implements
     Stage --> GameObject : manages
     GameStage --> InputSystem : creates
     GameObject --> Component : has
@@ -593,9 +596,10 @@ sequenceDiagram
     Main->>Engine: new Engine(canvas)
     Main->>StageManager: initialize(engine)
     
-    Main->>StageManager: createGameStage()
-    StageManager->>GameStage: new GameStage()
-    StageManager->>GameStage: initialize(engine)
+    Main->>GameStage: new GameStage()
+    Main->>StageManager: addStage(gameStage)
+    Main->>StageManager: setActiveStage(gameStage)
+    Main->>GameStage: initialize(engine)
     
     GameStage->>Scene: new Scene(engine)
     GameStage->>InputSystem: new InputSystem(scene)
@@ -613,12 +617,10 @@ sequenceDiagram
     GameStage->>GameObject: awake()
     GameObject->>Component: awake()
     
-    StageManager->>StageManager: addStage(gameStage)
-    StageManager->>StageManager: setActiveStage(gameStage)
+    Main->>GameStage: start()
     
-    Note over StageManager,Scene: Setup render observers
-    GameStage->>Scene: onBeforeRenderObservable.add(awake/start)
-    GameStage->>Scene: onBeforeRenderObservable.add(update loop)
+    Note over Main,Scene: Setup render observers
+    Main->>GameStage: scene.onBeforeRenderObservable.add(update loop)
     
     Main->>Engine: runRenderLoop()
     Engine->>Engine: render() every frame
@@ -774,14 +776,15 @@ src/
 ## Development Notes
 
 1. **Logging**: Configure log levels in `Main.initialize()` for debugging
-2. **Stage Management**: Use `StageManager` for stage lifecycle and coordination
-3. **Stage System**: Create custom stages by extending `Stage` class
-4. **GameObject System**: Extend `GameObject` for game objects, use composition with components
-5. **Components**: Create components by extending `Component` class, attach to GameObjects
-6. **Input**: Use `InputSystem` for action-based input handling with configurable bindings
-7. **Lifecycle**: Follow to awake -> start -> earlyUpdate -> update -> lateUpdate pattern
-8. **Hierarchy**: Use parent-child relationships for organized scene structure
-9. **Game Stages**: Use `GameStage` for main game logic or create custom stage types
+2. **Stage Management**: Use `StageManager` for stage lifecycle and coordination only
+3. **Stage Creation**: Create stages in application code (e.g., Main) and pass to StageManager
+4. **Stage System**: Create custom stages by extending `Stage` class
+5. **GameObject System**: Extend `GameObject` for game objects, use composition with components
+6. **Components**: Create components by extending `Component` class, attach to GameObjects
+7. **Input**: Use `InputSystem` for action-based input handling with configurable bindings
+8. **Lifecycle**: Follow to awake -> start -> earlyUpdate -> update -> lateUpdate pattern
+9. **Hierarchy**: Use parent-child relationships for organized scene structure
+10. **Game Stages**: Use `GameStage` for main game logic or create custom stage types
 
 ## Getting Started
 

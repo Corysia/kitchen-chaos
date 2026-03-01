@@ -2,6 +2,7 @@ import { Engine, Scene } from "@babylonjs/core";
 import { Logger as BabylonLoggerClass } from "@babylonjs/core/Misc/logger";
 import "@babylonjs/inspector";
 import { StageManager } from "./framework/StageManager";
+import { GameStage } from "./Stages/GameStage";
 import { Logger, LogLevel, LogTimestampFormat } from "./framework/logger/Logger";
 
 /**
@@ -44,9 +45,21 @@ class Main {
         
         // Initialize StageManager
         this.stageManager = StageManager.initialize(this.engine);
-        const stage = await this.stageManager.createGameStage();
-        const scene = stage.scene;
         
+        // Create and initialize GameStage
+        const gameStage = new GameStage();
+        this.stageManager.addStage(gameStage);
+        this.stageManager.setActiveStage(gameStage); // Set as active BEFORE initialization
+        await gameStage.initialize(this.engine);
+        gameStage.start();
+        
+        // Set up update loop
+        gameStage.scene.onBeforeRenderObservable.add(() => {
+            const dt = gameStage.scene.getEngine().getDeltaTime() / 1000;
+            this.stageManager.update(dt);
+        });
+        
+        const scene = gameStage.scene;
         this.onSceneCreated(scene);
     }
 
