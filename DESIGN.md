@@ -382,11 +382,18 @@ Interface defining the standard lifecycle methods for game objects and component
 
 **Methods**:
 
-- `awake()`: Initialization when object becomes active
-- `start()`: Called once before first update
-- `earlyUpdate(dt)`: Called every frame before main update
-- `update(dt)`: Called every frame for main game logic
-- `lateUpdate(dt)`: Called every frame after all updates
+- `awake()`: Initialization when object becomes active (async)
+- `start()`: Called once before first update (async)
+- `earlyUpdate(dt)`: Called every frame before main update (async)
+- `update(dt)`: Called every frame for main game logic (async)
+- `lateUpdate(dt)`: Called every frame after all updates (async)
+
+**Key Features**:
+
+- **Async Support**: All methods return `Promise<void>` for async operations
+- **Sequential Guarantees**: Strict execution order enforced at all levels
+- **Race Condition Prevention**: State checks prevent premature phase execution
+- **Frame Sequencing**: earlyUpdate → update → lateUpdate phases wait for completion
 
 **Note**: All methods are optional and can be implemented as needed.
 
@@ -642,31 +649,50 @@ sequenceDiagram
     GameObject->>GameObject: addComponent(component)
     Component->>Component: gameObject = this GameObject
     
-    Note over StageManager,Scene: Initialization Phase
+    Note over StageManager,Scene: Initialization Phase (Sequential)
+    Main->>Stage: initialize(engine)
+    Stage->>Stage: initialized = true
+    Main->>Stage: awake()
     Stage->>GameObject: awake()
     GameObject->>Component: awake()
     GameObject->>GameObject: children.forEach(awake)
+    Note over StageManager,Scene: All awake() calls complete
     
-    Note over StageManager,Scene: Start Phase (first frame)
-    Scene->>Stage: onBeforeRender (first time)
+    Main->>Stage: start()
     Stage->>GameObject: start()
     GameObject->>Component: start()
     GameObject->>GameObject: children.forEach(start)
+    Note over StageManager,Scene: All start() calls complete
+    Stage->>Stage: started = true
     
-    Note over StageManager,Scene: Game Loop (Every Frame)
+    Note over StageManager,Scene: Update Loop Setup (Only after init complete)
+    Main->>Scene: onBeforeRender.add(updateLoop)
+    
+    Note over StageManager,Scene: Game Loop (Sequential Phases)
     loop Each Frame
         Scene->>Stage: onBeforeRender
+        Stage->>StageManager: update(dt)
+        
+        Note over StageManager,Component: earlyUpdate Phase
+        StageManager->>Stage: earlyUpdate(dt)
         Stage->>GameObject: earlyUpdate(dt)
         GameObject->>Component: earlyUpdate(dt)
         GameObject->>GameObject: children.forEach(earlyUpdate)
+        Note over StageManager,Component: All earlyUpdate() complete
         
+        Note over StageManager,Component: update Phase
+        StageManager->>Stage: update(dt)
         Stage->>GameObject: update(dt)
         GameObject->>Component: update(dt)
         GameObject->>GameObject: children.forEach(update)
+        Note over StageManager,Component: All update() complete
         
+        Note over StageManager,Component: lateUpdate Phase
+        StageManager->>Stage: lateUpdate(dt)
         Stage->>GameObject: lateUpdate(dt)
         GameObject->>Component: lateUpdate(dt)
         GameObject->>GameObject: children.forEach(lateUpdate)
+        Note over StageManager,Component: All lateUpdate() complete
         
         Note over Scene: Rendering
         Scene->>Scene: render()
@@ -783,7 +809,7 @@ src/
 5. **GameObject System**: Extend `GameObject` for game objects, use composition with components
 6. **Components**: Create components by extending `Component` class, attach to GameObjects
 7. **Input**: Use `InputSystem` for action-based input handling with configurable bindings
-8. **Lifecycle**: Follow to awake -> start -> earlyUpdate -> update -> lateUpdate pattern
+8. **Lifecycle**: Follow async awake → start → earlyUpdate → update → lateUpdate pattern with sequential guarantees and race condition prevention
 9. **Hierarchy**: Use parent-child relationships for organized scene structure
 10. **Game Stages**: Use `GameStage` for main game logic or create custom stage types
 

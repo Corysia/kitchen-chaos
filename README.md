@@ -32,7 +32,7 @@ This game is still in the _**very early**_ stages of development, so don't expec
 
 ## Documentation
 
-For detailed technical documentation, including class descriptions, method documentation, and UML diagrams, see the [DOCUMENTATION.md](./DOCUMENTATION.md) file. This comprehensive guide covers:
+For detailed technical documentation, including class descriptions, method documentation, and UML diagrams, see the [DESIGN.md](./DESIGN.md) file. This comprehensive guide covers:
 
 - Complete class and method documentation
 - Mermaid UML diagrams (class diagrams and sequence diagrams)
