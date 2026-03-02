@@ -13,6 +13,8 @@ export class CharacterMovementComponent extends Component {
    * Gets the InputSystem from the active GameStage and registers movement callbacks
    */
   async awake() {
+    await super.awake();
+    
     // get the InputSystem from the active GameStage
     const activeStage = StageManager.instance.activeStage;
     
@@ -36,6 +38,13 @@ export class CharacterMovementComponent extends Component {
   left = false;
   right = false;
   jumpRequested = false;
+
+  /**
+   * Cleanup when component is destroyed
+   */
+  async destroy() {
+    await super.destroy?.();
+  }
 
   /**
    * Updates the character's movement based on input state

@@ -24,6 +24,8 @@ export class VisualComponent extends Component {
    * Parents the mesh to the GameObject's transform
    */
   async awake() {
+    await super.awake();
+    
     const scene = this.gameObject.transform.getScene();
     this.mesh = await this.meshFactory(scene);
 
@@ -36,5 +38,6 @@ export class VisualComponent extends Component {
    */
   async destroy() {
     this.mesh.dispose();
+    await super.destroy?.();
   }
 }

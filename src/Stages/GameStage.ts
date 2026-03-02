@@ -1,4 +1,4 @@
-import { Engine, MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3 } from "@babylonjs/core";
+import { MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3 } from "@babylonjs/core";
 import { Stage } from "../framework/Stage";
 import { GameObject } from "../framework/GameObject";
 import { VisualComponent } from "../framework/components/VisualComponent";
@@ -14,27 +14,31 @@ import { registerBuiltInLoaders } from "@babylonjs/loaders/dynamic";
 export class GameStage extends Stage {
     /** Global input system for handling user input */
     public inputSystem!: InputSystem;
+    /** The Babylon.js engine for this stage */
+    public engine!: any;
 
     private _shadowGenerator: ShadowGenerator | undefined;
 
     /**
-     * Initializes the game stage with the kitchen chaos scene.
-     * Sets up camera, lighting, ground, player, and kitchen counters.
-     * @param engine The Babylon.js engine to use
+     * Called when the stage is created. Sets up the scene, camera, lighting, and input system.
+     * This is where one-time setup that doesn't depend on other components should happen.
      */
-    public async initialize(engine: Engine): Promise<void> {
+    public async awake(): Promise<void> {
+        await super.awake();
+        
         registerBuiltInLoaders();
         
-        this.scene = new Scene(engine);
+        // Create scene
+        this.scene = new Scene(this.engine);
 
-        // initialize input system
+        // Initialize input system
         this.inputSystem = new InputSystem(this.scene);
 
-        // create camera
+        // Create camera
         const camera = new FreeCamera("camera1", new Vector3(0, 10, -10), this.scene);
         camera.setTarget(Vector3.Zero());
 
-        // create lights
+        // Create lights
         const hemlight = new HemisphericLight("light1", new Vector3(0, 1, 0), this.scene);
         hemlight.intensity = 0.7;
 
@@ -48,18 +52,20 @@ export class GameStage extends Stage {
         shadowGenerator.useExponentialShadowMap = true;
         this._shadowGenerator = shadowGenerator;
 
-        // create player
+        // Create player
         const player = this.createPlayer();
         this.addGameObject(player);
+    }
 
-        // load kitchen counters
-        await this.loadKitchenCounters();
-
-        // call awake on all objects
-        await Promise.all(this.gameObjects.map(go => go.awake()));
+    /**
+     * Called before the first frame. Loads assets and finalizes setup.
+     * This is where initialization that may depend on other components should happen.
+     */
+    public async start(): Promise<void> {
+        await super.start();
         
-        // Mark stage as initialized
-        this.initialized = true;
+        // Load kitchen counters
+        await this.loadKitchenCounters();
     }
 
     /**

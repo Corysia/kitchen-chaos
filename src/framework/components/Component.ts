@@ -14,17 +14,29 @@ export abstract class Component implements Lifecycle {
   /** The GameObject this component is attached to. Must be set for component to function. */
   public gameObject!: GameObject;
 
+  /** Flag indicating if awake has been called on this component */
+  public _awakeCalled = false;
+
+  /** Flag indicating if start has been called on this component */
+  public _startCalled = false;
+
   /**
    * Called when the component is initialized.
    * This method is optional and can be used to perform any necessary setup or initialization.
    */
-  awake?(): Promise<void>;
+  async awake(): Promise<void> {
+    if (this._awakeCalled) return;
+    this._awakeCalled = true;
+  }
 
   /**
    * Called when the component is started.
    * This method is optional and can be used to perform any necessary setup or initialization that requires the component to be fully initialized.
    */
-  start?(): Promise<void>;
+  async start(): Promise<void> {
+    if (this._startCalled) return;
+    this._startCalled = true;
+  }
 
   /**
    * Called every frame, before the main update loop.

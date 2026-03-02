@@ -51,13 +51,13 @@ class Main {
             // Initialize StageManager
             this.stageManager = StageManager.initialize(this.engine);
             
-            // Create and initialize GameStage
+            // Create and setup GameStage
             const gameStage = new GameStage();
+            gameStage.engine = this.engine; // Set engine reference
             this.stageManager.addStage(gameStage);
             await this.stageManager.setActiveStage(gameStage); // Set as active BEFORE initialization
-            await gameStage.initialize(this.engine);
             
-            // Ensure all lifecycle methods complete before starting update loop
+            // Use lifecycle methods for initialization
             await gameStage.awake();
             await gameStage.start();
             

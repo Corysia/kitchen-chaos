@@ -27,6 +27,12 @@ export class GameObject {
   /** Reference to the parent GameObject, if this is a child */
   public parent?: GameObject;
 
+  /** Flag indicating if awake has been called on this GameObject */
+  public _awakeCalled = false;
+
+  /** Flag indicating if start has been called on this GameObject */
+  public _startCalled = false;
+
   /**
    * Creates a new GameObject instance
    * @param name The identifier for this GameObject
@@ -45,6 +51,7 @@ export class GameObject {
   public addComponent<T extends Component>(comp: T): T {
     comp.gameObject = this;
     this.components.push(comp);
+    comp.awake();
     return comp;
   }
 
@@ -79,9 +86,11 @@ export class GameObject {
    * Called when the GameObject is first initialized
    */
   public async awake(): Promise<void> { 
+    if (this._awakeCalled) return;
+    this._awakeCalled = true;
+    
     const componentPromises = this.components
-      .map(c => c.awake?.())
-      .filter((promise): promise is Promise<void> => promise !== undefined);
+      .map(c => c.awake());
     
     const childPromises = this.children
       .map(child => child.awake());
@@ -94,9 +103,11 @@ export class GameObject {
    * Called once before the first frame update
    */
   public async start(): Promise<void> { 
+    if (this._startCalled) return;
+    this._startCalled = true;
+    
     const componentPromises = this.components
-      .map(c => c.start?.())
-      .filter((promise): promise is Promise<void> => promise !== undefined);
+      .map(c => c.start());
     
     const childPromises = this.children
       .map(child => child.start());

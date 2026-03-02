@@ -1,4 +1,4 @@
-import { Scene, Engine } from "@babylonjs/core";
+import { Scene } from "@babylonjs/core";
 import { GameObject } from "./GameObject";
 import { Lifecycle } from "./interfaces/Lifecycle";
 
@@ -20,23 +20,21 @@ export abstract class Stage implements Lifecycle {
     
     /** Flag indicating if the stage has started */
     public started = false;
-    
-    /** Flag indicating if the stage has been initialized */
-    public initialized = false;
 
-    /**
-     * Initializes the stage and creates its scene.
-     * Must be implemented by concrete stage classes.
-     * @param engine The Babylon.js engine to use for scene creation
-     * @returns Promise that resolves when the stage is fully initialized
-     */
-    public abstract initialize(engine: Engine): Promise<void>;
+    /** Flag indicating if awake has been called on this stage */
+    public _awakeCalled = false;
+
+    /** Flag indicating if start has been called on this stage */
+    public _startCalled = false;
 
     /**
      * Called when the stage is created. Sets up initial state.
      * Default implementation calls awake on all GameObjects.
      */
     public async awake(): Promise<void> {
+        if (this._awakeCalled) return;
+        this._awakeCalled = true;
+
         const promises = this.gameObjects.map(go => go.awake());
         await Promise.all(promises);
     }
@@ -46,7 +44,8 @@ export abstract class Stage implements Lifecycle {
      * Sets up update loops and calls start on all GameObjects.
      */
     public async start(): Promise<void> {
-        if (this.started) return;
+        if (this._startCalled) return;
+        this._startCalled = true;
         
         const promises = this.gameObjects.map(go => go.start());
         await Promise.all(promises);
