@@ -44,6 +44,10 @@ class Main {
             });
             this.engine = new Engine(this.canvas, true);
             
+            // Display loading screen immediately
+            // Shows Babylon.js default loading UI while stage initializes
+            this.engine.displayLoadingUI();
+            
             // Initialize StageManager
             this.stageManager = StageManager.initialize(this.engine);
             
@@ -64,6 +68,11 @@ class Main {
             });
             
             const scene = gameStage.scene;
+            
+            // Hide loading screen - stage is ready to render
+            // Hides Babylon.js loading UI after all initialization is complete
+            this.engine.hideLoadingUI();
+            
             this.onSceneCreated(scene);
             
             Logger.info('Game initialized successfully');
@@ -100,6 +109,10 @@ class Main {
                 ">Reload</button>
             `;
             document.body.appendChild(errorDiv);
+            
+            // Hide loading screen even if initialization failed
+            // Ensures loading UI doesn't remain visible on error
+            this.engine.hideLoadingUI();
             
             throw error;
         }
