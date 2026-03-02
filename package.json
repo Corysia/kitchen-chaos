@@ -8,13 +8,16 @@
     "host": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "nuke": "rm -rf dist node_modules package-lock.json && npm cache clean --force",
-    "clean": "rm -rf dist node_modules package-lock.json && npm install",
-    "test": "vitest"
+    "nuke": "rm -rf dist docs node_modules package-lock.json && npm cache clean --force",
+    "clean": "rm -rf dist docs node_modules package-lock.json && npm install",
+    "test": "vitest",
+    "docs": "typedoc --entryPointStrategy expand src",
+    "docs:serve": "typedoc --entryPointStrategy expand src && python -m http.server 8080 --directory docs"
   },
   "devDependencies": {
     "@babylonjs/core": "^8.52.0",
     "@babylonjs/inspector": "^8.52.0",
+    "typedoc": "^0.28.17",
     "typescript": "~5.7.2",
     "vite": "^6.3.1",
     "vitest": "^4.0.18"

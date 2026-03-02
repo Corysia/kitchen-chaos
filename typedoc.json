@@ -1,0 +1,22 @@
+{
+  "entryPoints": ["src/main.ts"],
+  "out": "docs",
+  "exclude": ["node_modules/", "dist/"],
+  "theme": "default",
+  "name": "Kitchen Chaos Documentation",
+  "readme": "README.md",
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeExternals": true,
+  "hideGenerator": true,
+  "sort": ["source-order"],
+  "kindSortOrder": [
+    "Class",
+    "Interface", 
+    "TypeAlias",
+    "Variable",
+    "Function",
+    "Enum",
+    "Namespace"
+  ]
+}

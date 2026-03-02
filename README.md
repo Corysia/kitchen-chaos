@@ -39,6 +39,20 @@ For detailed technical documentation, including class descriptions, method docum
 - Project architecture and design patterns
 - Development setup and guidelines
 
+### Generating Documentation
+
+To generate documentation locally:
+
+```bash
+# Generate HTML documentation
+npm run docs
+
+# Generate and serve documentation (with live reload)
+npm run docs:serve
+```
+
+The documentation will be generated in the `docs/` directory and can be served at `http://localhost:8080`.
+
 ## Getting Started
 
 This project was bootstrapped with my BabylonJS Vite tutorial, [vite-project](https://github.com/corysia/vite-project).  The only requirements are Node.js and NPM.

@@ -22,11 +22,10 @@ export enum LogTimestampFormat {
 }
 
 /**
- * A static utility class for logging messages to the console with configurable
+ * A utility class for logging messages to the console with configurable
  * log levels and timestamp formatting. Automatically disables logging in production.
  * 
  * @class Logger
- * @static
  * @module framework
  * @example
  * ```typescript

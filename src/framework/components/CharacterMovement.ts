@@ -8,6 +8,10 @@ export class CharacterMovementComponent extends Component {
   input!: InputSystem;
   speed = 5;
 
+  /**
+   * Initializes the component by setting up input event listeners
+   * Gets the InputSystem from the active GameStage and registers movement callbacks
+   */
   async awake() {
     // get the InputSystem from the active GameStage
     const activeStage = StageManager.instance.activeStage;
@@ -33,6 +37,10 @@ export class CharacterMovementComponent extends Component {
   right = false;
   jumpRequested = false;
 
+  /**
+   * Updates the character's movement based on input state
+   * @param dt Delta time in seconds since the last frame
+   */
   async update(dt: number) {
     const t = this.gameObject.transform;
 
