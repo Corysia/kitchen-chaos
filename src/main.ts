@@ -1,6 +1,5 @@
 import { Engine, Scene } from "@babylonjs/core";
 import { Logger as BabylonLoggerClass } from "@babylonjs/core/Misc/logger";
-import "@babylonjs/inspector";
 import { StageManager } from "./framework/StageManager";
 import { GameStage } from "./Stages/GameStage";
 import { Logger, LogLevel, LogTimestampFormat } from "./framework/logger/Logger";
@@ -152,7 +151,10 @@ class Main {
                     if (activeScene?.debugLayer.isVisible()) {
                         activeScene.debugLayer.hide();
                     } else if (activeScene) {
-                        activeScene.debugLayer.show();
+                        // Dynamically import inspector only when needed
+                        import("@babylonjs/inspector").then(() => {
+                            activeScene.debugLayer.show();
+                        });
                     }
                 }
             } 
