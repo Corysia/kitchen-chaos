@@ -36,7 +36,11 @@ describe('Framework Simple Tests', () => {
                 gameObjects: [],
                 started: false,
                 initialized: false,
-                scene: { dispose: vi.fn() } as any,
+                scene: { 
+                    dispose: vi.fn(),
+                    onBeforeRenderObservable: { add: vi.fn(), removeCallback: vi.fn() },
+                    getEngine: vi.fn().mockReturnValue({ getDeltaTime: vi.fn().mockReturnValue(16.67) })
+                } as any,
                 initialize: vi.fn(),
                 awake: vi.fn(),
                 start: vi.fn(),
@@ -57,7 +61,11 @@ describe('Framework Simple Tests', () => {
                 gameObjects: [],
                 started: false,
                 initialized: false,
-                scene: { dispose: vi.fn() } as any,
+                scene: { 
+                    dispose: vi.fn(),
+                    onBeforeRenderObservable: { add: vi.fn(), removeCallback: vi.fn() },
+                    getEngine: vi.fn().mockReturnValue({ getDeltaTime: vi.fn().mockReturnValue(16.67) })
+                } as any,
                 initialize: vi.fn(),
                 awake: vi.fn(),
                 start: vi.fn(),
@@ -78,7 +86,11 @@ describe('Framework Simple Tests', () => {
                 gameObjects: [],
                 started: false,
                 initialized: false,
-                scene: { dispose: vi.fn() } as any,
+                scene: { 
+                    dispose: vi.fn(),
+                    onBeforeRenderObservable: { add: vi.fn(), removeCallback: vi.fn() },
+                    getEngine: vi.fn().mockReturnValue({ getDeltaTime: vi.fn().mockReturnValue(16.67) })
+                } as any,
                 initialize: vi.fn(),
                 awake: vi.fn(),
                 start: vi.fn(),
@@ -99,7 +111,11 @@ describe('Framework Simple Tests', () => {
                 gameObjects: [],
                 started: true,
                 initialized: true,
-                scene: { dispose: vi.fn() } as any,
+                scene: { 
+                    dispose: vi.fn(),
+                    onBeforeRenderObservable: { add: vi.fn(), removeCallback: vi.fn() },
+                    getEngine: vi.fn().mockReturnValue({ getDeltaTime: vi.fn().mockReturnValue(16.67) })
+                } as any,
                 initialize: vi.fn(),
                 awake: vi.fn(),
                 start: vi.fn(),
