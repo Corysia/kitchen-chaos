@@ -1,4 +1,4 @@
-import { MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3 } from "@babylonjs/core";
+import { MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3, Color4, ImageProcessingPostProcess, FxaaPostProcess, DefaultRenderingPipeline, TonemappingOperator } from "@babylonjs/core";
 import { Stage } from "../framework/Stage";
 import { GameObject } from "../framework/GameObject";
 import { VisualComponent } from "../framework/components/VisualComponent";
@@ -16,6 +16,8 @@ export class GameStage extends Stage {
     public inputSystem!: InputSystem;
     /** The Babylon.js engine for this stage */
     public engine!: any;
+    /** The main camera for the game scene */
+    public camera!: FreeCamera;
 
     private _shadowGenerator: ShadowGenerator | undefined;
 
@@ -35,8 +37,8 @@ export class GameStage extends Stage {
         this.inputSystem = new InputSystem(this.scene);
 
         // Create camera
-        const camera = new FreeCamera("camera1", new Vector3(0, 10, -10), this.scene);
-        camera.setTarget(Vector3.Zero());
+        this.camera = new FreeCamera("camera1", new Vector3(0, 10, -10), this.scene);
+        this.camera.setTarget(Vector3.Zero());
 
         // Create lights
         const hemlight = new HemisphericLight("light1", new Vector3(0, 1, 0), this.scene);
@@ -51,10 +53,6 @@ export class GameStage extends Stage {
         const shadowGenerator = new ShadowGenerator(1024, light);
         shadowGenerator.useExponentialShadowMap = true;
         this._shadowGenerator = shadowGenerator;
-
-        // Create player
-        const player = this.createPlayer();
-        this.addGameObject(player);
     }
 
     /**
@@ -66,6 +64,13 @@ export class GameStage extends Stage {
         
         // Load kitchen counters
         await this.loadKitchenCounters();
+
+        
+        // Create player
+        const player = this.createPlayer();
+        this.addGameObject(player);
+
+        this.applyPostProcessingEffects();
     }
 
     /**
@@ -176,5 +181,39 @@ export class GameStage extends Stage {
         ground.material = this.createGroundMaterial(textureUrl, tileX, tileY);
         ground.receiveShadows = true;
         return ground;
+    }
+
+    /**
+     * Applies post-processing effects to the scene.
+     * 
+     * @private
+     * @returns {void}
+     */
+    private applyPostProcessingEffects(): void {
+        if (!this.scene) {
+            Logger.error("Scene is undefined");
+            return;
+        }
+        if (!this.camera) {
+            Logger.error("Camera is undefined");
+            return;
+        }
+        const postProcess = new ImageProcessingPostProcess("processing", 1, this.camera);
+        postProcess.contrast = 2;
+        postProcess.exposure = 0.6;
+        postProcess.toneMappingEnabled = true;
+        postProcess.toneMappingType = TonemappingOperator.Photographic; // Use Hable tone mapping operator
+        postProcess.vignetteEnabled = true; // Enable vignette effect
+        postProcess.vignetteColor = new Color4(0, 0, 0, 1); // Color of the vignette effect
+        postProcess.vignetteWeight = 0.4; // Weight of the vignette effect
+
+        const fxaaPostProcess = new FxaaPostProcess("fxaa", 4, this.camera);
+        fxaaPostProcess.apply();
+
+        const defaultPipeline = new DefaultRenderingPipeline("ssao", true, this.scene, [this.camera]);
+        defaultPipeline.bloomEnabled = true;
+        defaultPipeline.bloomWeight = 1; // Weight of the bloom effect
+        defaultPipeline.bloomThreshold = 0.95; // Threshold for bloom effect
+        defaultPipeline.fxaaEnabled = true; // Enable FXAA for anti-aliasing
     }
 }

@@ -54,17 +54,7 @@ class Main {
             const gameStage = new GameStage();
             gameStage.engine = this.engine; // Set engine reference
             this.stageManager.addStage(gameStage);
-            await this.stageManager.setActiveStage(gameStage); // Set as active BEFORE initialization
-            
-            // Use lifecycle methods for initialization
-            await gameStage.awake();
-            await gameStage.start();
-            
-            // Set up update loop only after all initialization is complete
-            gameStage.scene.onBeforeRenderObservable.add(async () => {
-                const dt = gameStage.scene.getEngine().getDeltaTime() / 1000;
-                await this.stageManager.update(dt);
-            });
+            await this.stageManager.setActiveStage(gameStage); 
             
             const scene = gameStage.scene;
             

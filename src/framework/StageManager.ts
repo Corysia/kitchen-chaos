@@ -70,6 +70,7 @@ export class StageManager {
      * @param stage The stage to add
      */
     public addStage(stage: Stage): void {
+        stage.awake();
         this.stages.push(stage);
     }
 
@@ -92,8 +93,16 @@ export class StageManager {
     public async setActiveStage(stage: Stage): Promise<void> {
         if (this.activeStage) {
             this.activeStage.started = false;
+            // Remove the update for the curretly active starge
+            // TODO: this.activeStage.scene.onBeforeRenderObservable.removeCallback(this.activeStage.update);
         }
         this.activeStage = stage;
+        await stage.start();
+        // Set up update loop only after all initialization is complete
+        stage.scene.onBeforeRenderObservable.add(async () => {
+            const dt = stage.scene.getEngine().getDeltaTime() / 1000;
+            await stage.update(dt);
+        });
     }
 
     /**
