@@ -7,6 +7,7 @@
     "dev": "vite",
     "host": "vite --host",
     "build": "tsc && vite build",
+    "buildDbg": "VITE_DEBUG=true npm run build",
     "preview": "vite preview",
     "nuke": "rm -rf dist docs node_modules package-lock.json && npm cache clean --force",
     "clean": "rm -rf dist docs node_modules package-lock.json && npm install",

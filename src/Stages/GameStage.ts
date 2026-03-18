@@ -1,4 +1,4 @@
-import { MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3, Color4, ImageProcessingPostProcess, FxaaPostProcess, DefaultRenderingPipeline, TonemappingOperator } from "@babylonjs/core";
+import { MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, PBRMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3, Color4, ImageProcessingPostProcess, FxaaPostProcess, DefaultRenderingPipeline, TonemappingOperator } from "@babylonjs/core";
 import { Stage } from "../framework/Stage";
 import { GameObject } from "../framework/GameObject";
 import { VisualComponent } from "../framework/components/VisualComponent";
@@ -65,6 +65,8 @@ export class GameStage extends Stage {
         // Load kitchen counters
         await this.loadKitchenCounters();
 
+        // Load some items
+        await this.loadItems();
         
         // Create player
         const player = this.createPlayer();
@@ -84,6 +86,7 @@ export class GameStage extends Stage {
         ClearCounter.rotation = Vector3.Zero();
         ClearCounter.receiveShadows = true;
         this._shadowGenerator?.addShadowCaster(ClearCounter);
+        this.adjustMeshMaterials(result.meshes);
         Logger.debug("ClearCounter_Visual.glb loaded successfully");
 
         Logger.debug('Starting to load CuttingCounter_Visual.glb');
@@ -93,6 +96,7 @@ export class GameStage extends Stage {
         CuttingCounter.rotation = Vector3.Zero();
         CuttingCounter.receiveShadows = true;
         this._shadowGenerator?.addShadowCaster(CuttingCounter);
+        this.adjustMeshMaterials(result1.meshes);
         Logger.debug("CuttingCounter_Visual.glb loaded successfully");
 
         Logger.debug('Starting to load StoveCounter_Visual.glb');
@@ -102,10 +106,75 @@ export class GameStage extends Stage {
         StoveCounter.rotation = Vector3.Zero();
         StoveCounter.receiveShadows = true;
         this._shadowGenerator?.addShadowCaster(StoveCounter);
+        this.adjustMeshMaterials(result2.meshes);
         Logger.debug("StoveCounter_Visual.glb loaded successfully");
 
         this.scene.getMeshByName("StoveOnVisual")?.setEnabled(true);
-        Logger.debug("All actors loaded successfully");
+        Logger.debug("All counters loaded successfully");
+    }
+
+    /**
+     * Adjusts material properties to reduce shine on loaded meshes
+     * @param meshes Array of meshes to process
+     * @param metallic Value for PBR metallic property (0-1)
+     * @param roughness Value for PBR roughness property (0-1)
+     * @param specularColor RGB values for StandardMaterial specular color
+     * @param specularPower Value for StandardMaterial specular power
+     */
+    private adjustMeshMaterials(
+        meshes: any[], 
+        metallic: number = 0.2, 
+        roughness: number = 0.4, 
+        specularColor: Color3 = new Color3(0.5, 0.5, 0.5), 
+        specularPower: number = 64
+    ): void {
+        meshes.forEach(mesh => {
+            if (mesh.material) {
+                Logger.debug(`Mesh: ${mesh.name}, Material type: ${mesh.material.constructor.name}`);
+                
+                // Check if it's a PBR material
+                if (mesh.material instanceof PBRMaterial) {
+                    Logger.debug('Found PBR material - adjusting metallic/roughness properties');
+                    // PBR materials use different properties
+                    const pbrMaterial = mesh.material;
+                    Logger.debug(`Current metallic: ${pbrMaterial.metallic}, roughness: ${pbrMaterial.roughness}`);
+                    pbrMaterial.metallic = metallic;
+                    pbrMaterial.roughness = roughness;
+                } else if (mesh.material instanceof StandardMaterial) {
+                    Logger.debug('Found StandardMaterial - adjusting specular properties');
+                    const material = mesh.material as StandardMaterial;
+                    Logger.debug(`Current specularColor: ${material.specularColor}, specularPower: ${material.specularPower}`);
+                    material.specularColor = specularColor;
+                    material.specularPower = specularPower;
+                }
+            }
+        });
+    }
+
+    /**
+     * Loads some items
+     */
+    private async loadItems(): Promise<void> {
+        Logger.debug('Starting to load Tomato_Visual.glb');
+        const result = await ImportMeshAsync('./models/Tomato_Visual.glb', this.scene);
+        const Tomato = result.meshes[0];
+        Tomato.position = new Vector3(2, 0, 0);
+        Tomato.rotation = Vector3.Zero();
+        Tomato.receiveShadows = true;
+        this._shadowGenerator?.addShadowCaster(Tomato);
+        this.adjustMeshMaterials(result.meshes);
+        Logger.debug("Tomato_Visual.glb loaded successfully");
+
+
+        Logger.debug('Starting to load Cabbage_Visual.glb');
+        const result1 = await ImportMeshAsync('./models/Cabbage_Visual.glb', this.scene);
+        const Cabbage = result1.meshes[0];
+        Cabbage.position = new Vector3(3.5, 0, 0);
+        Cabbage.rotation = Vector3.Zero();
+        Cabbage.receiveShadows = true;
+        this._shadowGenerator?.addShadowCaster(Cabbage);
+        this.adjustMeshMaterials(result1.meshes);
+        Logger.debug("Cabbage_Visual.glb loaded successfully");
     }
 
     /**
@@ -130,14 +199,17 @@ export class GameStage extends Stage {
             if (eyeRM) {
                 const blackMaterial = new StandardMaterial("EyeR_Black_Material", scene);
                 blackMaterial.diffuseColor = new Color3(0, 0, 0);
-                blackMaterial.specularColor = new Color3(1, 1, 1);
-                blackMaterial.specularPower = 128;
-                blackMaterial.ambientColor = new Color3(0.1, 0.1, 0.1);
+                // blackMaterial.specularColor = new Color3(1, 1, 1);
+                // blackMaterial.specularPower = 128;
+                // blackMaterial.ambientColor = new Color3(0.1, 0.1, 0.1);
                 eyeRM.material = blackMaterial;
                 Logger.debug("Eye_R material set to black");
             } else {
                 Logger.warn("Eye_R mesh not found in PlayerVisual.glb");
             }
+
+            // Adjust materials on all loaded meshes
+            this.adjustMeshMaterials(result.meshes);
             
             Logger.debug("PlayerVisual.glb loaded successfully");
             return PlayerVisual;
@@ -199,10 +271,10 @@ export class GameStage extends Stage {
             return;
         }
         const postProcess = new ImageProcessingPostProcess("processing", 1, this.camera);
-        postProcess.contrast = 2;
-        postProcess.exposure = 0.6;
-        postProcess.toneMappingEnabled = true;
-        postProcess.toneMappingType = TonemappingOperator.Photographic; // Use Hable tone mapping operator
+        postProcess.contrast = 2.3;
+        postProcess.exposure = 0.7; // raise by 20%
+        postProcess.toneMappingEnabled = true; // By not setting a tone Mapping Type, this is neutral.
+        postProcess.toneMappingType = TonemappingOperator.Hable; // Use Reinhard tone mapping operator (closest to Unity Neutral)
         postProcess.vignetteEnabled = true; // Enable vignette effect
         postProcess.vignetteColor = new Color4(0, 0, 0, 1); // Color of the vignette effect
         postProcess.vignetteWeight = 0.4; // Weight of the vignette effect
