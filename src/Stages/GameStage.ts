@@ -1,4 +1,4 @@
-import { MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, PBRMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3, Color4, ImageProcessingPostProcess, FxaaPostProcess, DefaultRenderingPipeline, TonemappingOperator } from "@babylonjs/core";
+import { MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, PBRMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3, Color4, ImageProcessingPostProcess, FxaaPostProcess, DefaultRenderingPipeline, TonemappingOperator, ColorCurves } from "@babylonjs/core";
 import { Stage } from "../framework/Stage";
 import { GameObject } from "../framework/GameObject";
 import { VisualComponent } from "../framework/components/VisualComponent";
@@ -222,19 +222,29 @@ export class GameStage extends Stage {
     }
 
     /**
-     * Creates and returns a standard material with a diffuse texture for the ground.
+     * Creates and returns a standard material with a diffuse texture and optional bump map for the ground.
      * @param textureUrl The URL of the diffuse texture
      * @param tileX The number of times to repeat the texture along the U axis
      * @param tileY The number of times to repeat the texture along the V axis
-     * @returns The created ground material with the applied texture
+     * @param bumpTextureUrl Optional URL of the bump/normal map texture
+     * @returns The created ground material with the applied texture(s)
      */
-    private createGroundMaterial(textureUrl: string, tileX: number, tileY: number): StandardMaterial {
+    private createGroundMaterial(textureUrl: string, tileX: number, tileY: number, bumpTextureUrl?: string): StandardMaterial {
         const groundTexture = new Texture(textureUrl, this.scene);
         groundTexture.uScale = tileX;
         groundTexture.vScale = tileY;
 
         const groundMaterial = new StandardMaterial("groundMaterial", this.scene);
         groundMaterial.diffuseTexture = groundTexture;
+        
+        // Add bump mapping if texture URL is provided
+        if (bumpTextureUrl) {
+            const bumpTexture = new Texture(bumpTextureUrl, this.scene);
+            bumpTexture.uScale = tileX;
+            bumpTexture.vScale = tileY;
+            groundMaterial.bumpTexture = bumpTexture;
+        }
+        
         return groundMaterial;
     }
 
@@ -271,13 +281,17 @@ export class GameStage extends Stage {
             return;
         }
         const postProcess = new ImageProcessingPostProcess("processing", 1, this.camera);
-        postProcess.contrast = 2.3;
-        postProcess.exposure = 0.7; // raise by 20%
+        postProcess.contrast = 1.2;
+        postProcess.exposure = 1.1;
         postProcess.toneMappingEnabled = true; // By not setting a tone Mapping Type, this is neutral.
-        postProcess.toneMappingType = TonemappingOperator.Hable; // Use Reinhard tone mapping operator (closest to Unity Neutral)
+        postProcess.toneMappingType = TonemappingOperator.Reinhard; // Use Reinhard tone mapping operator (closest to Unity Neutral)
         postProcess.vignetteEnabled = true; // Enable vignette effect
         postProcess.vignetteColor = new Color4(0, 0, 0, 1); // Color of the vignette effect
         postProcess.vignetteWeight = 0.4; // Weight of the vignette effect
+        postProcess.colorCurves = new ColorCurves();
+        if (postProcess.colorCurves) {
+            postProcess.colorCurves.globalSaturation = 1.2;
+        }
 
         const fxaaPostProcess = new FxaaPostProcess("fxaa", 4, this.camera);
         fxaaPostProcess.apply();
