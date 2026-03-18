@@ -14,6 +14,15 @@ class Main {
     private stageManager!: StageManager;
 
     /**
+     * Check if debug mode is enabled via URL parameter
+     * @returns True if debug mode should be enabled
+     */
+    private isDebugEnabled(): boolean {
+        const urlParams = new URLSearchParams(globalThis.location.search);
+        return urlParams.has('debug') || urlParams.has('dev');
+    }
+
+    /**
      * Initializes game by creating canvas, engine, and StageManager
      * Sets up event listeners and starts render loop
      */
@@ -23,11 +32,14 @@ class Main {
             Logger.setLogLevel(LogLevel.TRACE);
             
             // Set BabylonJS logger to DEBUG level equivalent
-            // In production, only show errors and warnings from BabylonJS
-            if (import.meta.env.PROD) {
+            // In production, only show errors and warnings from BabylonJS unless debug is enabled
+            const debugEnabled = this.isDebugEnabled();
+            if (import.meta.env.PROD && !debugEnabled) {
                 BabylonLoggerClass.LogLevels = 1; // ERROR level only
+                Logger.setLogLevel(LogLevel.ERROR);
             } else {
-                BabylonLoggerClass.LogLevels = 4; // DEBUG level in development
+                BabylonLoggerClass.LogLevels = 4; // DEBUG level in development or when debug is enabled
+                Logger.setLogLevel(LogLevel.DEBUG);
             }
             
             this.canvas = document.createElement("canvas");
@@ -162,7 +174,7 @@ class Main {
                 this.engine.switchFullscreen(false);
             }
             // Shift+Ctrl+Alt+I
-            if (!import.meta.env.PROD) {
+            if (!import.meta.env.PROD || this.isDebugEnabled()) {
                 if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === "KeyI") {
                     const activeScene = this.stageManager.getActiveScene();
                     if (activeScene?.debugLayer.isVisible()) {

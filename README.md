@@ -3,11 +3,14 @@
 - [Kitchen Chaos](#kitchen-chaos)
   - [Play for Free](#play-for-free)
     - [Controls](#controls)
+      - [Debug Mode](#debug-mode)
       - [Future controls](#future-controls)
   - [Documentation](#documentation)
+    - [Generating Documentation](#generating-documentation)
   - [Getting Started](#getting-started)
   - [Installation](#installation)
   - [Development](#development)
+    - [Debug Builds](#debug-builds)
   - [Debugging in Babylon.js with Visual Studio Code](#debugging-in-babylonjs-with-visual-studio-code)
 
 [![GitHub](https://img.shields.io/github/stars/corysia/kitchen-chaos?style=social)](https://github.com/corysia/kitchen-chaos)
@@ -23,7 +26,20 @@ This game is still in the _**very early**_ stages of development, so don't expec
 ### Controls
 
 - Toggle Fullscreen - `shift-ctrl-alt-f`
-- Debug inspector - `shift-ctrl-alt-i`
+- Debug inspector - `shift-ctrl-alt-i` (requires debug mode)
+
+#### Debug Mode
+
+The game supports debug mode that enables additional features:
+
+- **Enable debug in production**: Add `?debug` or `?dev` to the URL
+  - [Play with debug enabled](https://corysia.github.io/kitchen-chaos/?debug)
+  - [Play with dev enabled](https://corysia.github.io/kitchen-chaos/?dev)
+
+- **Debug features**:
+  - Enhanced logging levels
+  - Babylon.js Inspector access for scene debugging
+  - Console output preservation in production builds
 
 #### Future controls
 
@@ -75,6 +91,24 @@ npm run dev
 ```
 
 This will start a local server and provide a URL to connect to.
+
+### Debug Builds
+
+To create production builds with debug features preserved:
+
+```bash
+# Build with debug mode enabled (preserves console logs and debug features)
+VITE_DEBUG=true npm run build
+
+# Or using DEBUG environment variable
+DEBUG=true npm run build
+```
+
+Debug builds will:
+
+- Preserve console.log, console.debug, and console.info statements
+- Enable Babylon.js Inspector access
+- Maintain enhanced logging levels
 
 ## Debugging in Babylon.js with Visual Studio Code
 
