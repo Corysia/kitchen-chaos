@@ -41,7 +41,34 @@ class Main {
             this.canvas.addEventListener('click', () => {
                 this.canvas.focus();
             });
-            this.engine = new Engine(this.canvas, true);
+            // Try WebGPU engine first, fall back to WebGL if not supported
+            let engine: Engine | null = null;
+            try {
+                engine = new Engine(this.canvas, true, { 
+                    preserveDrawingBuffer: true, 
+                    stencil: true,
+                    antialias: true,
+                    alpha: true,
+                    adaptToDeviceRatio: true,
+                    audioEngine: true,
+                    useHighPrecisionMatrix: true,
+                    premultipliedAlpha: true,
+                    doNotHandleContextLost: false,
+                    powerPreference: "high-performance"
+                }, true);
+                
+                if (!engine) {
+                    throw new Error("WebGPU engine creation returned null");
+                }
+                
+                Logger.info("WebGPU engine created successfully");
+            } catch (webgpuError) {
+                Logger.warn("WebGPU engine creation failed, falling back to WebGL", webgpuError);
+                engine = new Engine(this.canvas, true);
+                Logger.info("WebGL engine created as fallback");
+            }
+            
+            this.engine = engine;
             
             // Display loading screen immediately
             // Shows Babylon.js default loading UI while stage initializes
