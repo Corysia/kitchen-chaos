@@ -10,6 +10,10 @@
 
 - If running tools on the command line to do any file activity - always run them in a bash shell. Do not use Powershell or CMD.
 - Always close the command shell after running tools.
+- Use `exit` command to explicitly terminate bash shells when they remain open.
+- Check for lingering bash processes with `ps` and terminate as needed.
+- The bash tool may leave shells open - always verify closure after command execution.
+- `npm test` runs Vitest in watch mode - use `npm test -- --run` to avoid hanging processes.
 
 # INTERPRETATION RULES
 

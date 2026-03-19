@@ -192,4 +192,40 @@ class Main {
 }
 
 const main = new Main();
-main.initialize();
+try {
+    main.initialize().catch(error => {
+        Logger.error('Unhandled error during game initialization', error);
+        
+        // Display fallback error UI if initialization fails completely
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ff4444;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            z-index: 1000;
+        `;
+        errorDiv.innerHTML = `
+            <h2>Game Failed to Start</h2>
+            <p>A critical error occurred during initialization.</p>
+            <button onclick="location.reload()" style="
+                background: white;
+                color: #ff4444;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-top: 10px;
+            ">Reload</button>
+        `;
+        document.body.appendChild(errorDiv);
+    });
+} catch (error) {
+    Logger.error('Synchronous error during game initialization', error);
+}
