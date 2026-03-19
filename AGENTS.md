@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD025 MD013 -->
 # GLOBAL TONE
 
 - No praise words (“Perfect”, “Awesome”, etc.).
