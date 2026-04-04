@@ -157,7 +157,7 @@ describe('CharacterMovementComponent', () => {
         const initialX = mockTransform.position.x;
         const initialZ = mockTransform.position.z;
 
-        await characterMovement.update(1.0);
+        await characterMovement.update(1);
 
         // Verify movement only in negative Z direction (backward)
         expect(mockTransform.position.x).toBe(initialX);
@@ -178,7 +178,7 @@ describe('CharacterMovementComponent', () => {
         const initialX = mockTransform.position.x;
         const initialZ = mockTransform.position.z;
 
-        await characterMovement.update(1.0);
+        await characterMovement.update(1);
 
         // Verify movement only in negative X direction (left)
         expect(mockTransform.position.x).toBeLessThan(initialX);
@@ -199,7 +199,7 @@ describe('CharacterMovementComponent', () => {
         const initialX = mockTransform.position.x;
         const initialZ = mockTransform.position.z;
 
-        await characterMovement.update(1.0);
+        await characterMovement.update(1);
 
         // Verify movement only in positive X direction (right)
         expect(mockTransform.position.x).toBeGreaterThan(initialX);
@@ -221,7 +221,7 @@ describe('CharacterMovementComponent', () => {
         const initialX = mockTransform.position.x;
         const initialZ = mockTransform.position.z;
 
-        await characterMovement.update(1.0);
+        await characterMovement.update(1);
 
         // Should move in both X and Z directions (diagonal)
         expect(mockTransform.position.x).toBeGreaterThan(initialX);
@@ -247,7 +247,7 @@ describe('CharacterMovementComponent', () => {
         const initialX = mockTransform.position.x;
         const initialZ = mockTransform.position.z;
 
-        await characterMovement.update(1.0);
+        await characterMovement.update(1);
 
         // Position should remain unchanged when no movement flags are active
         expect(mockTransform.position.x).toBe(initialX);
@@ -265,7 +265,7 @@ describe('CharacterMovementComponent', () => {
     it('should handle jump request', async () => {
         characterMovement.jumpRequested = true;
 
-        await characterMovement.update(1.0);
+        await characterMovement.update(1);
 
         // Jump request should be consumed (reset to false)
         expect(characterMovement.jumpRequested).toBe(false);
@@ -284,7 +284,7 @@ describe('CharacterMovementComponent', () => {
         characterMovement.forward = true;
         const initialZ = mockTransform.position.z;
 
-        await characterMovement.update(1.0);
+        await characterMovement.update(1);
 
         const distance = mockTransform.position.z - initialZ;
         expect(distance).toBeCloseTo(10, 2); // speed * dt
@@ -341,7 +341,7 @@ describe('CharacterMovementComponent', () => {
         const initialX = mockTransform.position.x;
         const initialZ = mockTransform.position.z;
 
-        await characterMovement.update(1.0);
+        await characterMovement.update(1);
 
         // Calculate the actual distance moved using Euclidean distance formula
         const actualDistance = Math.sqrt(
@@ -366,7 +366,7 @@ describe('CharacterMovementComponent', () => {
         characterMovement.forward = true;
         
         // Currently throws - this identifies need for better error handling
-        await expect(characterMovement.update(1.0)).rejects.toThrow();
+        await expect(characterMovement.update(1)).rejects.toThrow();
     });
 
     /**
@@ -381,7 +381,7 @@ describe('CharacterMovementComponent', () => {
         characterMovement.forward = true;
         
         // Currently throws - this identifies need for better error handling
-        await expect(characterMovement.update(1.0)).rejects.toThrow();
+        await expect(characterMovement.update(1)).rejects.toThrow();
     });
 
     /**
@@ -396,7 +396,7 @@ describe('CharacterMovementComponent', () => {
         characterMovement.forward = true;
         
         // Currently throws - this identifies need for better error handling
-        await expect(characterMovement.update(1.0)).rejects.toThrow();
+        await expect(characterMovement.update(1)).rejects.toThrow();
     });
 
     /**
@@ -411,7 +411,7 @@ describe('CharacterMovementComponent', () => {
         characterMovement.forward = true;
         
         // Currently throws - this identifies need for better error handling
-        await expect(characterMovement.update(1.0)).rejects.toThrow();
+        await expect(characterMovement.update(1)).rejects.toThrow();
     });
 
     /**
@@ -427,25 +427,23 @@ describe('CharacterMovementComponent', () => {
         // Test negative speed
         characterMovement.speed = -5;
         characterMovement.forward = true;
-        const initialZ = mockTransform.position.z;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test zero speed
         characterMovement.speed = 0;
-        const initialZ2 = mockTransform.position.z;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test very large speed
         characterMovement.speed = Number.MAX_SAFE_INTEGER;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test NaN speed
-        characterMovement.speed = NaN;
+        characterMovement.speed = Number.NaN;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
     });
 
     /**
@@ -461,10 +459,10 @@ describe('CharacterMovementComponent', () => {
         characterMovement.forward = true;
         
         // Test negative delta time
-        await expect(characterMovement.update(-1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(-1)).resolves.not.toThrow();
         
         // Test NaN delta time
-        await expect(characterMovement.update(NaN)).resolves.not.toThrow();
+        await expect(characterMovement.update(Number.NaN)).resolves.not.toThrow();
         
         // Test Infinity delta time
         await expect(characterMovement.update(Infinity)).resolves.not.toThrow();
@@ -485,7 +483,7 @@ describe('CharacterMovementComponent', () => {
         characterMovement.forward = true;
         
         // Currently throws - this identifies need for better error handling
-        await expect(characterMovement.update(1.0)).rejects.toThrow();
+        await expect(characterMovement.update(1)).rejects.toThrow();
     });
 
     /**
@@ -501,22 +499,22 @@ describe('CharacterMovementComponent', () => {
         characterMovement.forward = true;
         
         // Currently handles gracefully - this identifies good robustness
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test missing z property - currently handled gracefully
         mockTransform.position = { x: 0, y: 0 } as any;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test missing y property - currently handled gracefully
         mockTransform.position = { x: 0, z: 0 } as any;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test completely empty position object - currently handled gracefully
         mockTransform.position = {} as any;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
     });
 
     /**
@@ -532,22 +530,22 @@ describe('CharacterMovementComponent', () => {
         characterMovement.forward = true;
         
         // Currently handles gracefully - this identifies good robustness
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test null values - currently handled gracefully
         mockTransform.position = { x: null, y: null, z: null } as any;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test undefined values - currently handled gracefully
         mockTransform.position = { x: undefined, y: undefined, z: undefined } as any;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test NaN values - currently handled gracefully
         mockTransform.position = { x: Number.NaN, y: Number.NaN, z: Number.NaN } as any;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
     });
 
     /**
@@ -564,7 +562,7 @@ describe('CharacterMovementComponent', () => {
         characterMovement.forward = true;
         characterMovement.backward = true;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test left and right both true
         characterMovement.forward = false;
@@ -572,7 +570,7 @@ describe('CharacterMovementComponent', () => {
         characterMovement.left = true;
         characterMovement.right = true;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test all directions true
         characterMovement.forward = true;
@@ -580,7 +578,7 @@ describe('CharacterMovementComponent', () => {
         characterMovement.left = true;
         characterMovement.right = true;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
         
         // Test all directions false (already tested above, but included for completeness)
         characterMovement.forward = false;
@@ -588,6 +586,6 @@ describe('CharacterMovementComponent', () => {
         characterMovement.left = false;
         characterMovement.right = false;
         
-        await expect(characterMovement.update(1.0)).resolves.not.toThrow();
+        await expect(characterMovement.update(1)).resolves.not.toThrow();
     });
 });

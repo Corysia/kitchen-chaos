@@ -342,8 +342,8 @@ describe('StageManager', () => {
         await stageManager.setActiveStage(stage);
         
         // Test with very large delta time (e.g., game freeze for 10 seconds)
-        await expect(stageManager.update(10.0)).resolves.not.toThrow();
-        expect(stage.update).toHaveBeenCalledWith(10.0);
+        await expect(stageManager.update(10)).resolves.not.toThrow();
+        expect(stage.update).toHaveBeenCalledWith(10);
         
         // Reset mocks
         vi.clearAllMocks();

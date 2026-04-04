@@ -211,7 +211,7 @@ describe('Logger', () => {
             Logger.info('Empty array', []);
             
             // Test with empty Error
-            Logger.error('Empty error', new Error());
+            Logger.error('Empty error', new Error('Test error message'));
         }).not.toThrow();
     });
 });
