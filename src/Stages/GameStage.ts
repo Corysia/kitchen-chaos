@@ -1,5 +1,6 @@
-import { MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, PBRMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3, Color4, ImageProcessingPostProcess, FxaaPostProcess, DefaultRenderingPipeline, TonemappingOperator, ColorCurves } from "@babylonjs/core";
+import { MeshBuilder, Scene, FreeCamera, Vector3, HemisphericLight, DirectionalLight, StandardMaterial, PBRMaterial, Texture, GroundMesh, ShadowGenerator, ImportMeshAsync, Color3, Color4, DefaultRenderingPipeline, TonemappingOperator, ColorCurves } from "@babylonjs/core";
 import { Stage } from "../framework/Stage";
+import { StageManager } from "../framework/StageManager";
 import { GameObject } from "../framework/GameObject";
 import { VisualComponent } from "../framework/components/VisualComponent";
 import { CharacterMovementComponent } from "../framework/components/CharacterMovement";
@@ -8,17 +9,12 @@ import { Logger } from "../framework/logger/Logger";
 import { registerBuiltInLoaders } from "@babylonjs/loaders/dynamic";
 
 /**
- * Concrete implementation of Stage for the main game scene.
- * Contains the kitchen chaos game environment with player, counters, and game objects.
+ * GameStage class that manages the main game scene
+ * Extends Stage to provide game-specific functionality
  */
 export class GameStage extends Stage {
-    /** Global input system for handling user input */
-    public inputSystem!: InputSystem;
-    /** The Babylon.js engine for this stage */
-    public engine!: any;
-    /** The main camera for the game scene */
     public camera!: FreeCamera;
-
+    public inputSystem!: InputSystem;
     private _shadowGenerator: ShadowGenerator | undefined;
 
     /**
@@ -30,15 +26,22 @@ export class GameStage extends Stage {
         
         registerBuiltInLoaders();
         
-        // Create scene
-        this.scene = new Scene(this.engine);
+        // Create scene with HDR configuration
+        this.scene = new Scene(StageManager.instance.engine);
+        this.scene.clearColor = new Color4(0.02, 0.02, 0.02, 1); // Dark HDR clear color
+        this.scene.imageProcessingConfiguration.toneMappingEnabled = true;
+        this.scene.imageProcessingConfiguration.toneMappingType = TonemappingOperator.Reinhard; // Use Reinhard as fallback
+        this.scene.imageProcessingConfiguration.exposure = 1;
 
-        // Initialize input system
+        // Input system will be initialized when needed
         this.inputSystem = new InputSystem(this.scene);
 
-        // Create camera
+        // Create camera with HDR configuration
         this.camera = new FreeCamera("camera1", new Vector3(0, 10, -10), this.scene);
         this.camera.setTarget(Vector3.Zero());
+        this.camera.minZ = 0.1;
+        this.camera.maxZ = 1000;
+        this.camera.fov = 0.8; // Slightly wider FOV for better HDR composition
 
         // Create lights
         const hemlight = new HemisphericLight("light1", new Vector3(0, 1, 0), this.scene);
@@ -165,7 +168,6 @@ export class GameStage extends Stage {
         this.adjustMeshMaterials(result.meshes);
         Logger.debug("Tomato_Visual.glb loaded successfully");
 
-
         Logger.debug('Starting to load Cabbage_Visual.glb');
         const result1 = await ImportMeshAsync('./models/Cabbage_Visual.glb', this.scene);
         const Cabbage = result1.meshes[0];
@@ -224,7 +226,7 @@ export class GameStage extends Stage {
      * @param tileX The number of times to repeat the texture along the U axis
      * @param tileY The number of times to repeat the texture along the V axis
      * @param bumpTextureUrl Optional URL of the bump/normal map texture
-     * @returns The created ground material with the applied texture(s)
+     * @returns The created ground material with applied texture(s)
      */
     private createGroundMaterial(textureUrl: string, tileX: number, tileY: number, bumpTextureUrl?: string): StandardMaterial {
         const groundTexture = new Texture(textureUrl, this.scene);
@@ -263,10 +265,7 @@ export class GameStage extends Stage {
     }
 
     /**
-     * Applies post-processing effects to the scene.
-     * 
-     * @private
-     * @returns {void}
+     * Applies HDR post-processing effects including bloom, tone mapping, and anti-aliasing
      */
     private applyPostProcessingEffects(): void {
         if (!this.scene) {
@@ -277,26 +276,35 @@ export class GameStage extends Stage {
             Logger.error("Camera is undefined");
             return;
         }
-        const postProcess = new ImageProcessingPostProcess("processing", 1, this.camera);
-        postProcess.contrast = 1.2;
-        postProcess.exposure = 1.1;
-        postProcess.toneMappingEnabled = true; // By not setting a tone Mapping Type, this is neutral.
-        postProcess.toneMappingType = TonemappingOperator.Reinhard; // Use Reinhard tone mapping operator (closest to Unity Neutral)
-        postProcess.vignetteEnabled = true; // Enable vignette effect
-        postProcess.vignetteColor = new Color4(0, 0, 0, 1); // Color of the vignette effect
-        postProcess.vignetteWeight = 0.4; // Weight of the vignette effect
-        postProcess.colorCurves = new ColorCurves();
-        if (postProcess.colorCurves) {
-            postProcess.colorCurves.globalSaturation = 1.2;
-        }
 
-        const fxaaPostProcess = new FxaaPostProcess("fxaa", 4, this.camera);
-        fxaaPostProcess.apply();
-
-        const defaultPipeline = new DefaultRenderingPipeline("ssao", true, this.scene, [this.camera]);
+        // Create default rendering pipeline with HDR features
+        const defaultPipeline = new DefaultRenderingPipeline("default", true, this.scene, [this.camera]);
+        
+        // Anti-aliasing
+        defaultPipeline.samples = 4; // MSAA for better quality
+        defaultPipeline.fxaaEnabled = true;
+        
+        // Bloom configuration
         defaultPipeline.bloomEnabled = true;
-        defaultPipeline.bloomWeight = 1; // Weight of the bloom effect
-        defaultPipeline.bloomThreshold = 0.95; // Threshold for bloom effect
-        defaultPipeline.fxaaEnabled = true; // Enable FXAA for anti-aliasing
+        defaultPipeline.bloomKernel = 64; // Higher quality bloom
+        defaultPipeline.bloomWeight = 0.95; // More subtle bloom
+        defaultPipeline.bloomThreshold = 1; // Only bloom bright areas
+        
+        // Image processing (built into pipeline)
+        defaultPipeline.imageProcessing.contrast = 1.1;
+        defaultPipeline.imageProcessing.exposure = 1;
+        defaultPipeline.imageProcessing.toneMappingEnabled = true;
+        defaultPipeline.imageProcessing.toneMappingType = TonemappingOperator.Reinhard;
+        
+        // Vignette effect
+        defaultPipeline.imageProcessing.vignetteEnabled = true;
+        defaultPipeline.imageProcessing.vignetteWeight = 0.3;
+        defaultPipeline.imageProcessing.vignetteColor = new Color4(0, 0, 0, 1);
+        
+        // Color curves for saturation
+        defaultPipeline.imageProcessing.colorCurves = new ColorCurves();
+        if (defaultPipeline.imageProcessing.colorCurves) {
+            defaultPipeline.imageProcessing.colorCurves.globalSaturation = 1.1;
+        }
     }
 }

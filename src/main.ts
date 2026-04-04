@@ -91,7 +91,6 @@ class Main {
             
             // Create and setup GameStage
             const gameStage = new GameStage();
-            gameStage.engine = this.engine; // Set engine reference
             this.stageManager.addStage(gameStage);
             await this.stageManager.setActiveStage(gameStage); 
             
