@@ -16,12 +16,13 @@
     "docs:serve": "typedoc --entryPointStrategy expand src && python -m http.server 8080 --directory docs"
   },
   "devDependencies": {
-    "@babylonjs/core": "^8.52.0",
-    "@babylonjs/inspector": "^8.52.0",
-    "terser": "^5.46.0",
-    "typedoc": "^0.28.17",
-    "typescript": "~5.7.2",
-    "vite": "^6.3.1",
-    "vitest": "^4.0.18"
+    "@babylonjs/core": "^9.1.0",
+    "@babylonjs/gui-editor": "^9.1.0",
+    "@babylonjs/inspector": "^9.1.0",
+    "terser": "^5.46.1",
+    "typedoc": "^0.28.18",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3",
+    "vitest": "^4.1.2"
   }
 }

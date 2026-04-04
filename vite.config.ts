@@ -10,6 +10,11 @@ export default defineConfig(({ mode }) => {
 
     return {
         base: '/kitchen-chaos/',
+        resolve: {
+            alias: {
+                '@babylonjs/gui-editor/guiEditor.js': '@babylonjs/gui-editor/dist/babylon.guiEditor.js'
+            }
+        },
         build: {
             minify: 'terser',
             terserOptions: {
@@ -29,24 +34,28 @@ export default defineConfig(({ mode }) => {
                     }
                     warn(warning)
                 },
-                treeshake: 'smallest',
+                treeshake: true,
                 output: {
-                    manualChunks: {
+                    manualChunks(id) {
                         // Split BabylonJS core into its own chunk
-                        'babylon-core': ['@babylonjs/core'],
+                        if (id.includes('@babylonjs/core')) {
+                            return 'babylon-core';
+                        }
                         // Split inspector into separate chunk (dev-only)
-                        'babylon-inspector': ['@babylonjs/inspector'],
+                        if (id.includes('@babylonjs/inspector')) {
+                            return 'babylon-inspector';
+                        }
                         // Split framework code
-                        'framework': [
-                            './src/framework/StageManager',
-                            './src/framework/GameObject',
-                            './src/framework/Stage'
-                        ],
+                        if (id.includes('src/framework/StageManager') || 
+                            id.includes('src/framework/GameObject') || 
+                            id.includes('src/framework/Stage')) {
+                            return 'framework';
+                        }
                         // Split game-specific code
-                        'game': [
-                            './src/Stages/GameStage',
-                            './src/main'
-                        ]
+                        if (id.includes('src/Stages/GameStage') || 
+                            id.includes('src/main')) {
+                            return 'game';
+                        }
                     }
                 }
             }

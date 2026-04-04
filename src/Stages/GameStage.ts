@@ -199,9 +199,6 @@ export class GameStage extends Stage {
             if (eyeRM) {
                 const blackMaterial = new StandardMaterial("EyeR_Black_Material", scene);
                 blackMaterial.diffuseColor = new Color3(0, 0, 0);
-                // blackMaterial.specularColor = new Color3(1, 1, 1);
-                // blackMaterial.specularPower = 128;
-                // blackMaterial.ambientColor = new Color3(0.1, 0.1, 0.1);
                 eyeRM.material = blackMaterial;
                 Logger.debug("Eye_R material set to black");
             } else {
