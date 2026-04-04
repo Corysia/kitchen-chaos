@@ -39,6 +39,8 @@
 - All methods must have JSDoc documentation.
 - When updating methods, review and update JSDoc as necessary.
 - Always use explicit scope modifiers (private, protected, public) for class members.
+- Unit tests must be organized in separate test files named after the class they test (e.g., `StageManager.test.ts` for `StageManager` class).
+- All tests must be heavily documented with comprehensive explanations of what functionality is being tested, why it's important, how the test verifies behavior, and what specific outcomes are expected.
 
 # REVIEWER
 

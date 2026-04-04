@@ -19,6 +19,7 @@
     "@babylonjs/core": "^9.1.0",
     "@babylonjs/gui-editor": "^9.1.0",
     "@babylonjs/inspector": "^9.1.0",
+    "@types/node": "^25.5.2",
     "terser": "^5.46.1",
     "typedoc": "^0.28.18",
     "typescript": "^6.0.2",

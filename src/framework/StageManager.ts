@@ -24,6 +24,14 @@ export class StageManager {
     private _activeStage: Stage | null = null;
     
     /**
+     * Gets the array of all stages (for testing purposes)
+     * @returns The array of stages
+     */
+    public getStages(): Stage[] {
+        return this.stages;
+    }
+    
+    /**
      * Gets the currently active stage
      * @returns The active stage or null if no stage is active
      */
