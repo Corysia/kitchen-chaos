@@ -13,25 +13,25 @@ import { Component } from "./components/Component";
  */
 export class GameObject {
   /** The name/identifier for this GameObject */
-  public name: string;
+  private _name: string;
   
   /** The Babylon.js TransformNode that handles position, rotation, and scale */
-  public transform: TransformNode;
+  private _transform: TransformNode;
   
   /** Array of components attached to this GameObject */
-  public components: Component[] = [];
+  private _components: Component[] = [];
   
   /** Array of child GameObjects in the hierarchy */
-  public children: GameObject[] = [];
+  private _children: GameObject[] = [];
   
   /** Reference to the parent GameObject, if this is a child */
-  public parent?: GameObject;
+  private _parent?: GameObject;
 
   /** Flag indicating if awake has been called on this GameObject */
-  public _awakeCalled = false;
+  private _awakeCalled = false;
 
   /** Flag indicating if start has been called on this GameObject */
-  public _startCalled = false;
+  private _startCalled = false;
 
   /**
    * Creates a new GameObject instance
@@ -39,8 +39,120 @@ export class GameObject {
    * @param scene The Babylon.js scene to create the transform in
    */
   public constructor(name: string, scene: Scene) {
-    this.name = name;
-    this.transform = new TransformNode(name + "_transform", scene);
+    this._name = name;
+    this._transform = new TransformNode(name + "_transform", scene);
+  }
+
+  /**
+   * Gets the name/identifier for this GameObject
+   * @returns The name of this GameObject
+   */
+  public get name(): string {
+    return this._name;
+  }
+
+  /**
+   * Sets the name/identifier for this GameObject
+   * @param name The new name for this GameObject
+   */
+  public set name(name: string) {
+    this._name = name;
+  }
+
+  /**
+   * Gets the Babylon.js TransformNode that handles position, rotation, and scale
+   * @returns The TransformNode for this GameObject
+   */
+  public get transform(): TransformNode {
+    return this._transform;
+  }
+
+  /**
+   * Sets the Babylon.js TransformNode that handles position, rotation, and scale
+   * @param transform The new TransformNode for this GameObject
+   */
+  public set transform(transform: TransformNode) {
+    this._transform = transform;
+  }
+
+  /**
+   * Gets the array of components attached to this GameObject
+   * @returns The components array
+   */
+  public get components(): Component[] {
+    return this._components;
+  }
+
+  /**
+   * Sets the array of components attached to this GameObject
+   * @param components The new components array
+   */
+  public set components(components: Component[]) {
+    this._components = components;
+  }
+
+  /**
+   * Gets the array of child GameObjects in the hierarchy
+   * @returns The children array
+   */
+  public get children(): GameObject[] {
+    return this._children;
+  }
+
+  /**
+   * Sets the array of child GameObjects in the hierarchy
+   * @param children The new children array
+   */
+  public set children(children: GameObject[]) {
+    this._children = children;
+  }
+
+  /**
+   * Gets the reference to the parent GameObject, if this is a child
+   * @returns The parent GameObject or undefined if none
+   */
+  public get parent(): GameObject | undefined {
+    return this._parent;
+  }
+
+  /**
+   * Sets the reference to the parent GameObject
+   * @param parent The new parent GameObject or undefined
+   */
+  public set parent(parent: GameObject | undefined) {
+    this._parent = parent;
+  }
+
+  /**
+   * Gets the flag indicating if awake has been called on this GameObject
+   * @returns True if awake has been called, false otherwise
+   */
+  public get awakeCalled(): boolean {
+    return this._awakeCalled;
+  }
+
+  /**
+   * Sets the flag indicating if awake has been called on this GameObject
+   * @param awakeCalled True if awake has been called, false otherwise
+   */
+  public set awakeCalled(awakeCalled: boolean) {
+    this._awakeCalled = awakeCalled;
+  }
+
+  /**
+   * Gets the flag indicating if start has been called on this GameObject
+   * @returns True if start has been called, false otherwise
+   */
+  public get startCalled(): boolean {
+    return this._startCalled;
+  }
+
+  /**
+   * Sets the flag indicating if start has been called on this GameObject
+   * @param startCalled True if start has been called, false otherwise
+   */
+  public set startCalled(startCalled: boolean) {
+    this._startCalled = startCalled;
   }
 
   /**

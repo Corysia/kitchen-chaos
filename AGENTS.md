@@ -38,6 +38,7 @@
 - Always use explicit access modifiers (public, private, protected) for class members.
 - All methods must have JSDoc documentation.
 - When updating methods, review and update JSDoc as necessary.
+- Always use explicit scope modifiers (private, protected, public) for class members.
 
 # REVIEWER
 

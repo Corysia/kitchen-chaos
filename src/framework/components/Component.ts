@@ -24,7 +24,7 @@ export abstract class Component implements Lifecycle {
    * Called when the component is initialized.
    * This method is optional and can be used to perform any necessary setup or initialization.
    */
-  async awake(): Promise<void> {
+  public async awake(): Promise<void> {
     if (this._awakeCalled) return;
     this._awakeCalled = true;
   }
@@ -33,7 +33,7 @@ export abstract class Component implements Lifecycle {
    * Called when the component is started.
    * This method is optional and can be used to perform any necessary setup or initialization that requires the component to be fully initialized.
    */
-  async start(): Promise<void> {
+  public async start(): Promise<void> {
     if (this._startCalled) return;
     this._startCalled = true;
   }
@@ -43,25 +43,25 @@ export abstract class Component implements Lifecycle {
    * This method is optional and can be used to perform any necessary updates that require the component to be updated before the main update loop.
    * @param dt The time since the last frame, in seconds.
    */
-  earlyUpdate?(dt: number): Promise<void>;
+  public earlyUpdate?(dt: number): Promise<void>;
 
   /**
    * Called every frame, during the main update loop.
    * This method is optional and can be used to perform any necessary updates.
    * @param dt The time since the last frame, in seconds.
    */
-  update?(dt: number): Promise<void>;
+  public update?(dt: number): Promise<void>;
 
   /**
    * Called every frame, after the main update loop.
    * This method is optional and can be used to perform any necessary updates that require the component to be updated after the main update loop.
    * @param dt The time since the last frame, in seconds.
    */
-  lateUpdate?(dt: number): Promise<void>;
+  public lateUpdate?(dt: number): Promise<void>;
 
   /**
    * Called when the component is being destroyed.
    * This method is optional and can be used to perform any necessary cleanup.
    */
-  destroy?(): Promise<void>;
+  public destroy?(): Promise<void>;
 }

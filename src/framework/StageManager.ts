@@ -15,16 +15,32 @@ export class StageManager {
     private static _instance: StageManager | null = null;
 
     /** The Babylon.js engine instance */
-    public engine: Engine;
+    protected _engine!: Engine;
     
     /** Array of all active stages */
-    public stages: Stage[] = [];
+    protected stages: Stage[] = [];
     
     /** The currently active stage */
-    public activeStage: Stage | null = null;
+    private _activeStage: Stage | null = null;
     
+    /**
+     * Gets the currently active stage
+     * @returns The active stage or null if no stage is active
+     */
+    public get activeStage(): Stage | null {
+        return this._activeStage;
+    }
+
+    /**
+     * Sets the currently active stage
+     * @param stage The stage to set as active
+     */
+    private set activeStage(stage: Stage | null) {
+        this._activeStage = stage;
+    }
+
     /** Flag indicating if the game has started */
-    public started = false;
+    protected started = false;
 
     /**
      * Creates a new StageManager instance (singleton pattern)
@@ -37,6 +53,22 @@ export class StageManager {
         }
         StageManager._instance = this;
         this.engine = engine;
+    }
+
+    /**
+     * Gets the Babylon.js engine instance
+     * @returns The Babylon.js engine
+     */
+    public get engine(): Engine {
+        return this._engine;
+    }
+
+    /**
+     * Sets the Babylon.js engine instance
+     * @param engine The new Babylon.js engine
+     */
+    public set engine(engine: Engine) {
+        this._engine = engine;
     }
 
     /**

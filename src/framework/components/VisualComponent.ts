@@ -9,13 +9,13 @@ export class VisualComponent extends Component {
   /**
    * The mesh created by the component.
    */
-  mesh!: AbstractMesh;
+  private mesh!: AbstractMesh;
 
   /**
    * Creates a new VisualComponent with a mesh factory function
    * @param meshFactory Function that creates the mesh when the component awakens
    */
-  constructor(private readonly meshFactory: (scene: Scene) => Promise<AbstractMesh>) {
+  public constructor(private readonly meshFactory: (scene: Scene) => Promise<AbstractMesh>) {
     super();
   }
 
@@ -23,7 +23,7 @@ export class VisualComponent extends Component {
    * Initializes the component by creating the mesh using the factory function
    * Parents the mesh to the GameObject's transform
    */
-  async awake() {
+  public async awake() {
     await super.awake();
     
     const scene = this.gameObject.transform.getScene();
@@ -36,7 +36,7 @@ export class VisualComponent extends Component {
   /**
    * Cleans up the component by disposing the mesh
    */
-  async destroy() {
+  public async destroy() {
     this.mesh.dispose();
     await super.destroy?.();
   }

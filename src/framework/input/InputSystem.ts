@@ -30,7 +30,7 @@ export class InputSystem {
    * @param scene The Babylon.js scene to attach input listeners to
    * @param bindings Optional custom key bindings, defaults to WASD + Space
    */
-  constructor(scene: Scene, bindings: KeyBindingMap = defaultBindings) {
+  public constructor(scene: Scene, bindings: KeyBindingMap = defaultBindings) {
     this.scene = scene;
     this.bindings = bindings;
 

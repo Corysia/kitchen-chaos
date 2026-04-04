@@ -9,10 +9,17 @@ export class CharacterMovementComponent extends Component {
   speed = 5;
 
   /**
+   * Creates a new CharacterMovementComponent
+   */
+  public constructor() {
+    super();
+  }
+
+  /**
    * Initializes the component by setting up input event listeners
    * Gets the InputSystem from the active GameStage and registers movement callbacks
    */
-  async awake() {
+  public async awake() {
     await super.awake();
     
     // get the InputSystem from the active GameStage
@@ -42,7 +49,7 @@ export class CharacterMovementComponent extends Component {
   /**
    * Cleanup when component is destroyed
    */
-  async destroy() {
+  public async destroy() {
     await super.destroy?.();
   }
 
@@ -50,7 +57,7 @@ export class CharacterMovementComponent extends Component {
    * Updates the character's movement based on input state
    * @param dt Delta time in seconds since the last frame
    */
-  async update(dt: number) {
+  public async update(dt: number) {
     const t = this.gameObject.transform;
 
     let dx = 0;
