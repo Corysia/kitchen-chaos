@@ -109,8 +109,8 @@ export class StageManager {
      * Adds a stage to the manager.
      * @param stage The stage to add
      */
-    public addStage(stage: Stage): void {
-        stage.awake();
+    public async addStage(stage: Stage): Promise<void> {
+        await stage.awake();
         this.stages.push(stage);
     }
 
@@ -131,18 +131,30 @@ export class StageManager {
      * @param stage The stage to make active
      */
     public async setActiveStage(stage: Stage): Promise<void> {
+        // Properly deactivate previous stage
         if (this.activeStage) {
-            this.activeStage.started = false;
-            // Remove the update for the curretly active starge
-            // TODO: this.activeStage.scene.onBeforeRenderObservable.removeCallback(this.activeStage.update);
+            // Remove previous stage's update callback
+            const previousCallback = this.activeStage.getUpdateCallback();
+            if (previousCallback) {
+                this.activeStage.scene.onBeforeRenderObservable.removeCallback(previousCallback);
+                this.activeStage.setUpdateCallback(null);
+            }
+            // Deactivate the previous stage
+            await this.activeStage.deactivate();
         }
+        
         this.activeStage = stage;
         await stage.start();
-        // Set up update loop only after all initialization is complete
-        stage.scene.onBeforeRenderObservable.add(async () => {
+        
+        // Store callback reference for later removal
+        const updateCallback = async () => {
             const dt = stage.scene.getEngine().getDeltaTime() / 1000;
             await stage.update(dt);
-        });
+        };
+        stage.setUpdateCallback(updateCallback);
+        
+        // Set up update loop only after all initialization is complete
+        stage.scene.onBeforeRenderObservable.add(updateCallback);
     }
 
     /**

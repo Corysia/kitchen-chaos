@@ -27,6 +27,9 @@ export abstract class Stage implements Lifecycle {
     /** Flag indicating if start has been called on this stage */
     public _startCalled = false;
 
+    /** Reference to the update callback for cleanup */
+    private _updateCallback: (() => void) | null = null;
+
     /**
      * Called when the stage is created. Sets up initial state.
      * Default implementation calls awake on all GameObjects.
@@ -114,5 +117,39 @@ export abstract class Stage implements Lifecycle {
         if (this.scene) {
             this.scene.dispose();
         }
+    }
+
+    /**
+     * Deactivates the stage (called during stage transitions).
+     * Pauses all GameObjects and stops update loops.
+     */
+    public async deactivate(): Promise<void> {
+        if (!this.started) return;
+
+        this.started = false;
+        const promises = this.gameObjects.map(go => {
+            // Call deactivate on GameObjects if they have it
+            if ('deactivate' in go && typeof go.deactivate === 'function') {
+                return (go as any).deactivate();
+            }
+            return Promise.resolve();
+        });
+        await Promise.all(promises);
+    }
+
+    /**
+     * Gets the update callback reference for cleanup.
+     * @returns The update callback or null
+     */
+    public getUpdateCallback(): (() => void) | null {
+        return this._updateCallback;
+    }
+
+    /**
+     * Sets the update callback reference.
+     * @param callback The update callback to store
+     */
+    public setUpdateCallback(callback: (() => void) | null): void {
+        this._updateCallback = callback;
     }
 }

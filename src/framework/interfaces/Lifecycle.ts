@@ -50,4 +50,10 @@ export interface Lifecycle {
    * Use for cleanup of resources, event listeners, etc.
    */
   destroy?(): void | Promise<void>;
+
+  /**
+   * Called when the component is being deactivated (stage transition).
+   * Use for pausing, stopping timers, etc.
+   */
+  deactivate?(): void | Promise<void>;
 }
