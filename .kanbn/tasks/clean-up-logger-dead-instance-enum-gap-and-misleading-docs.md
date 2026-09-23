@@ -1,5 +1,9 @@
 ---
+tags:
+  - Bug
+  - Low
 created: 2026-09-16T04:26:42.464Z
+updated: 2026-09-23T15:20:31.666Z
 ---
 
 # Clean up Logger dead instance, enum gap, and misleading docs
@@ -22,12 +26,3 @@ created: 2026-09-16T04:26:42.464Z
 - [ ] Remove getInstance()/and the _instance field from Logger.
 - [ ] Make LogTimestampFormat values sequential and explain each value.
 - [ ] Correct the production-gating JSDoc (production is a build-time constant).
-
-## History
-
-- type: created
-  date: 2026-09-16T04:26:42.464Z
-  column: To Do
-  fromProgress: 0
-  toProgress: 0
-  author: Corysia Taware

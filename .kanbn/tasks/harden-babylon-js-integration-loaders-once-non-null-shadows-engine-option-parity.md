@@ -1,6 +1,9 @@
 ---
+tags:
+  - Bug
+  - High
 created: 2026-09-16T04:26:58.471Z
-updated: 2026-09-16T04:27:13.237Z
+updated: 2026-09-23T15:51:16.096Z
 ---
 
 # Harden Babylon.js integration: loaders once, non-null shadows, engine option parity
@@ -28,3 +31,4 @@ updated: 2026-09-16T04:27:13.237Z
 ## Relations
 
 - [depends-on refactor-game-stage-into-services-and-externalize-hardcoded-asset-config](refactor-game-stage-into-services-and-externalize-hardcoded-asset-config.md)
+- [blocked-by refactor-game-stage-into-services-and-externalize-hardcoded-asset-config](refactor-game-stage-into-services-and-externalize-hardcoded-asset-config.md)

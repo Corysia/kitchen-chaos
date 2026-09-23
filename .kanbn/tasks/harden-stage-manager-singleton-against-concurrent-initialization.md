@@ -1,5 +1,9 @@
 ---
+tags:
+  - Bug
+  - High
 created: 2026-09-16T04:26:38.908Z
+updated: 2026-09-23T15:20:31.347Z
 ---
 
 # Harden StageManager singleton against concurrent initialization
@@ -19,12 +23,3 @@ created: 2026-09-16T04:26:38.908Z
 - [ ] Replace the check-then-act guard with an atomic/globalThis-backed guard that prevents concurrent double-initialization.
 - [ ] Add a formal test reset hook for the singleton instead of mutating the private _instance field via as any.
 - [ ] Document and lock down initialize() idempotency semantics (return existing vs throw) in the JSDoc and in tests.
-
-## History
-
-- type: created
-  date: 2026-09-16T04:26:38.908Z
-  column: To Do
-  fromProgress: 0
-  toProgress: 0
-  author: Corysia Taware

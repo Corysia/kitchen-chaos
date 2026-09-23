@@ -1,6 +1,0 @@
-name: Kanbn-mcp
-version: 1.1.0
-schema: v1
-mcpServers:
-  - name: kanbn-mcp
-    command: kanbn-mcp

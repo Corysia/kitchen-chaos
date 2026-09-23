@@ -1,5 +1,9 @@
 ---
+tags:
+  - Bug
+  - Critical
 created: 2026-09-16T04:26:05.195Z
+updated: 2026-09-23T15:20:29.207Z
 ---
 
 # Prevent overlapping async stage updates in the game loop
@@ -19,12 +23,3 @@ created: 2026-09-16T04:26:05.195Z
 - [ ] Introduce a frame scheduler in StageManager that queues pending updates and cancels/drops stale ones when a previous update is still in flight.
 - [ ] Wrap the observable callback in try/catch and deactivate the stage on persistent update errors instead of leaving a broken callback registered.
 - [ ] Reconcile the duplicate update paths: remove the dead public StageManager.update() or route it through the same scheduler so update() is never invoked twice per frame.
-
-## History
-
-- type: created
-  date: 2026-09-16T04:26:05.195Z
-  column: To Do
-  fromProgress: 0
-  toProgress: 0
-  author: Corysia Taware

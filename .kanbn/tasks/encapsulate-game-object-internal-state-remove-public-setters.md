@@ -1,5 +1,9 @@
 ---
+tags:
+  - Bug
+  - Medium
 created: 2026-09-16T04:26:18.001Z
+updated: 2026-09-23T15:44:21.269Z
 ---
 
 # Encapsulate GameObject internal state (remove public setters)
@@ -20,11 +24,9 @@ created: 2026-09-16T04:26:18.001Z
 - [ ] Refactor addChild/removeChild to manipulate the internal child array without the public setter.
 - [ ] Add internal lifecycle-flag mutation helpers (e.g. internal setter or dedicated methods) for the durable-write points.
 
-## History
+## Relations
 
-- type: created
-  date: 2026-09-16T04:26:18.001Z
-  column: To Do
-  fromProgress: 0
-  toProgress: 0
-  author: Corysia Taware
+- [blocks clean-up-component-optional-method-declarations-and-remove-as-any-in-stage-deactivate](clean-up-component-optional-method-declarations-and-remove-as-any-in-stage-deactivate.md)
+- [blocks validate-model-load-results-and-handle-asset-load-failures-gracefully](validate-model-load-results-and-handle-asset-load-failures-gracefully.md)
+- [blocks deferred-safe-destruction-for-stage-remove-game-object](deferred-safe-destruction-for-stage-remove-game-object.md)
+- [blocks inject-input-system-into-character-movement-and-unregister-listeners-on-destroy](inject-input-system-into-character-movement-and-unregister-listeners-on-destroy.md)

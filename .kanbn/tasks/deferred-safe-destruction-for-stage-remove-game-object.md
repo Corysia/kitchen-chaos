@@ -1,6 +1,9 @@
 ---
+tags:
+  - Bug
+  - High
 created: 2026-09-16T04:26:35.825Z
-updated: 2026-09-16T04:27:14.285Z
+updated: 2026-09-23T15:25:22.949Z
 ---
 
 # Deferred/safe destruction for Stage.removeGameObject
@@ -24,3 +27,5 @@ updated: 2026-09-16T04:27:14.285Z
 ## Relations
 
 - [depends-on encapsulate-game-object-internal-state-remove-public-setters](encapsulate-game-object-internal-state-remove-public-setters.md)
+- [blocks awake-start-game-objects-added-after-a-stage-has-started](awake-start-game-objects-added-after-a-stage-has-started.md)
+- [depends-on clean-up-component-optional-method-declarations-and-remove-as-any-in-stage-deactivate](clean-up-component-optional-method-declarations-and-remove-as-any-in-stage-deactivate.md)

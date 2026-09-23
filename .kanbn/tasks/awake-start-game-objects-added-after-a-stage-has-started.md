@@ -1,6 +1,9 @@
 ---
+tags:
+  - Bug
+  - High
 created: 2026-09-16T04:26:22.993Z
-updated: 2026-09-16T04:27:13.698Z
+updated: 2026-09-23T15:44:50.019Z
 ---
 
 # Awake/start GameObjects added after a stage has started
@@ -24,3 +27,4 @@ updated: 2026-09-16T04:27:13.698Z
 ## Relations
 
 - [depends-on encapsulate-game-object-internal-state-remove-public-setters](encapsulate-game-object-internal-state-remove-public-setters.md)
+- [blocks encapsulate-game-object-internal-state-remove-public-setters](encapsulate-game-object-internal-state-remove-public-setters.md)

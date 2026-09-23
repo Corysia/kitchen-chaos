@@ -1,5 +1,9 @@
 ---
+tags:
+  - Bug
+  - Critical
 created: 2026-09-16T04:26:14.165Z
+updated: 2026-09-23T15:25:22.640Z
 ---
 
 # Inject InputSystem into CharacterMovement and unregister listeners on destroy
@@ -28,11 +32,8 @@ created: 2026-09-16T04:26:14.165Z
 - [ ] Clamp delta time to a maximum (e.g. 0.1s) and guard non-finite speed/dt values in update().
 - [ ] Replace throw/no-throw 'handle invalid gracefully' tests with behavior-focused tests that validate inputs at the source.
 
-## History
+## Relations
 
-- type: created
-  date: 2026-09-16T04:26:14.165Z
-  column: To Do
-  fromProgress: 0
-  toProgress: 0
-  author: Corysia Taware
+- [depends-on encapsulate-game-object-internal-state-remove-public-setters](encapsulate-game-object-internal-state-remove-public-setters.md)
+- [blocks awake-start-game-objects-added-after-a-stage-has-started](awake-start-game-objects-added-after-a-stage-has-started.md)
+- [depends-on clean-up-component-optional-method-declarations-and-remove-as-any-in-stage-deactivate](clean-up-component-optional-method-declarations-and-remove-as-any-in-stage-deactivate.md)
