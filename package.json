@@ -16,9 +16,9 @@
     "docs:serve": "typedoc --entryPointStrategy expand src && python -m http.server 8080 --directory docs"
   },
   "devDependencies": {
-    "@babylonjs/core": "^9.1.0",
-    "@babylonjs/gui-editor": "^9.1.0",
-    "@babylonjs/inspector": "^9.1.0",
+    "@babylonjs/core": "^9.28.0",
+    "@babylonjs/gui-editor": "^9.28.0",
+    "@babylonjs/inspector": "^9.28.0",
     "@types/node": "^25.5.2",
     "terser": "^5.46.1",
     "typedoc": "^0.28.18",
