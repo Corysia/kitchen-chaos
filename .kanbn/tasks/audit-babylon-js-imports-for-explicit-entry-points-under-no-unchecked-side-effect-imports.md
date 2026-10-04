@@ -1,5 +1,9 @@
 ---
+tags:
+  - Bug
+  - Medium
 created: 2026-09-16T06:00:42.597Z
+updated: 2026-09-23T15:20:33.230Z
 ---
 
 # Audit Babylon.js imports for explicit entry points under noUncheckedSideEffectImports
@@ -19,12 +23,3 @@ created: 2026-09-16T06:00:42.597Z
 - [ ] Inventory every `@babylonjs/*` (and other scoped) import in `src/` and `tests/`; flag root, wildcard, and side-effect-only imports.
 - [ ] Convert flagged imports to explicit entry-point imports (or declared side-effect exports), verifying each against the package export map.
 - [ ] Add a CI/build guard so future imports that violate `noUncheckedSideEffectImports` fail the type-check.
-
-## History
-
-- type: created
-  date: 2026-09-16T06:00:42.597Z
-  column: To Do
-  fromProgress: 0
-  toProgress: 0
-  author: Corysia Taware

@@ -1,5 +1,9 @@
 ---
+tags:
+  - Bug
+  - High
 created: 2026-09-16T04:26:54.855Z
+updated: 2026-09-23T15:44:21.588Z
 ---
 
 # Fix Windows-incompatible scripts and type-check the tests directory
@@ -20,11 +24,6 @@ created: 2026-09-16T04:26:54.855Z
 - [ ] Replace rm -rf usage in nuke/clean with rimraf (or node -e) and add rimraf to devDependencies.
 - [ ] Add tests/ to tsconfig include (or introduce a tsconfig.tests.json) so strict linting applies to test files.
 
-## History
+## Relations
 
-- type: created
-  date: 2026-09-16T04:26:54.855Z
-  column: To Do
-  fromProgress: 0
-  toProgress: 0
-  author: Corysia Taware
+- [blocks replace-placeholder-weak-tests-with-real-behavioral-coverage](replace-placeholder-weak-tests-with-real-behavioral-coverage.md)

@@ -1,6 +1,9 @@
 ---
+tags:
+  - Bug
+  - High
 created: 2026-09-16T04:26:10.155Z
-updated: 2026-09-16T04:27:10.662Z
+updated: 2026-09-23T15:20:29.544Z
 ---
 
 # Validate model load results and handle asset load failures gracefully

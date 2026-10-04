@@ -1,5 +1,9 @@
 ---
+tags:
+  - Feature
+  - Medium
 created: 2026-09-16T04:26:30.497Z
+updated: 2026-09-23T15:44:20.295Z
 ---
 
 # Refactor GameStage into services and externalize hardcoded asset config
@@ -22,11 +26,7 @@ created: 2026-09-16T04:26:30.497Z
 - [ ] Move model paths, tuning values, and defaults into a GameConfig/constants module.
 - [ ] Extract applyPostProcessingEffects() into a dedicated post-processing set-up helper.
 
-## History
+## Relations
 
-- type: created
-  date: 2026-09-16T04:26:30.497Z
-  column: To Do
-  fromProgress: 0
-  toProgress: 0
-  author: Corysia Taware
+- [blocks validate-model-load-results-and-handle-asset-load-failures-gracefully](validate-model-load-results-and-handle-asset-load-failures-gracefully.md)
+- [blocks harden-babylon-js-integration-loaders-once-non-null-shadows-engine-option-parity](harden-babylon-js-integration-loaders-once-non-null-shadows-engine-option-parity.md)

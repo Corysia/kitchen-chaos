@@ -1,5 +1,9 @@
 ---
+tags:
+  - Bug
+  - Medium
 created: 2026-09-16T04:26:48.645Z
+updated: 2026-09-23T15:48:29.293Z
 ---
 
 # Clean up Component optional method declarations and remove as any in Stage.deactivate
@@ -21,11 +25,7 @@ created: 2026-09-16T04:26:48.645Z
 - [ ] Refactor Component so optional methods are declared via the Lifecycle interface only, with clear subclass override contracts.
 - [ ] Refactor Stage.deactivate() to dispatch deactivate through the typed Lifecycle interface or a narrow type guard, eliminating the 'as any' cast.
 
-## History
+## Relations
 
-- type: created
-  date: 2026-09-16T04:26:48.645Z
-  column: To Do
-  fromProgress: 0
-  toProgress: 0
-  author: Corysia Taware
+- [blocked-by inject-input-system-into-character-movement-and-unregister-listeners-on-destroy](inject-input-system-into-character-movement-and-unregister-listeners-on-destroy.md)
+- [blocked-by deferred-safe-destruction-for-stage-remove-game-object](deferred-safe-destruction-for-stage-remove-game-object.md)
